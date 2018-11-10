@@ -1,0 +1,13 @@
+<apex:page standardController="Account" showHeader="true" tabStyle="Account">
+    WellCome
+    <apex:detail relatedList="account" />
+    <h1>
+        hello this is kiran
+    </h1>
+    <p>
+        i am from kodad
+        <apex:outputText title="{!}">
+        </apex:outputText>
+    </p>
+    
+</apex:page>

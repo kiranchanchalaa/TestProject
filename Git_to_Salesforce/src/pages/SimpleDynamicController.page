@@ -1,0 +1,21 @@
+<apex:page controller="SimpleDynamicController">    
+    <apex:image id="theImage" value="{!$Resource.Kiran}" width="100px" height="100px" alt="Description of image here"/>
+        <apex:dynamicComponent componentValue="{!dynamicDetail}"/>
+    <apex:pageBlock >
+    <apex:include pageName="datasetExample" />
+    </apex:pageBlock>
+    
+    <!--<iframe height="50px" id="the frame" name="theframe" src="http://www.salesforce.com" width="50px"></iframe>-->
+       
+     
+   <!-- 
+The list view picklist for an object, including its associated list of records for the currently selected view. 
+In standard Salesforce applications this component is displayed on the main tab for a particular object.
+This component has additional attributes that can be specified, such as the height and rows per page, 
+as compared to <apex:listView>.
+
+
+<apex:enhancedList type="Account" height="300" rowsPerPage="10" id="AccountList" />
+    <apex:enhancedList type="Lead" height="300" rowsPerPage="25"></apex:enhancedList>
+    <apex:enhancedList type="contact" height="300" rowsPerPage="25"/>-->
+</apex:page>

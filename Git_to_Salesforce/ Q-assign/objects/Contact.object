@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>Assigned_From_Group__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Assigned From Group</label>
+        <length>18</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Assigned_From_OwnerUser__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Assigned From User (Deprecated)</label>
+        <length>18</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Assigned_From_Queue__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Assigned From Owner</label>
+        <length>18</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>Q_assign_Last_Assigned_Date__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <label>Q-assign Last Assigned Date</label>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>DateTime</type>
+    </fields>
+    <fields>
+        <fullName>Reviewed_Days__c</fullName>
+        <deprecated>false</deprecated>
+        <externalId>false</externalId>
+        <formula>LastModifiedDate - Q_assign_Last_Assigned_Date__c</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>Q-assign Reviewed Days</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>10</scale>
+        <type>Number</type>
+        <unique>false</unique>
+    </fields>
+    <webLinks>
+        <fullName>Take_Ownership</fullName>
+        <availability>online</availability>
+        <description>Q-assign: Gives ownership to the user pressing the button and updates Q-assign stats.</description>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Take Ownership</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/apex.js&quot;)}
+
+var userId = &quot;{!$User.Id}&quot;;
+var objectIdArray = {!GETRECORDIDS($ObjectType.Contact)};
+
+if ( objectIdArray.length &gt; 0 )
+{
+var result = sforce.apex.execute(&quot;ortoo_qra/AssignmentController&quot;,
+&quot;takeOwnership&quot;, {userId: userId, objectIdArray: objectIdArray } );
+if( result == &apos;&apos; )
+{
+window.alert( &apos;Ownership taken successfully.&apos; );
+}
+else
+{
+window.alert( &apos;Failed to take ownership. Details: &apos; + result );
+}
+document.location.reload( true );
+}
+else
+{
+window.alert( &apos;Please select at least one record.&apos; );
+}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Take_Ownership_Detail</fullName>
+        <availability>online</availability>
+        <description>Q-assign: Gives ownership to the user pressing the button and updates Q-assign stats.</description>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Take Ownership</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/apex.js&quot;)}
+
+var userId = &quot;{!$User.Id}&quot;;
+var objectIdArray = [ &quot;{!Contact.Id}&quot; ];
+
+if ( objectIdArray.length &gt; 0 )
+{
+var result = sforce.apex.execute(&quot;ortoo_qra/AssignmentController&quot;,
+&quot;takeOwnership&quot;, {userId: userId, objectIdArray: objectIdArray } );
+if( result == &apos;&apos; )
+{
+window.alert( &apos;Ownership taken successfully.&apos; );
+}
+else
+{
+window.alert( &apos;Failed to take ownership. Details: &apos; + result );
+}
+document.location.reload( true );
+}
+else
+{
+window.alert( &apos;Please select at least one record.&apos; );
+}</url>
+    </webLinks>
+</CustomObject>

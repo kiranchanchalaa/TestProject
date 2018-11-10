@@ -1,0 +1,17 @@
+.cSilu{
+    background-color:green;
+    padding-top:40px;
+    padding-left:40px;
+}
+.cSilu.red{
+    background-color:red;
+    padding-top:20px;
+    padding-left:20px
+}
+.cSilu.bule{
+    background-color:blue;
+}
+/*hear we can write with the class name also*/
+.cSilu.green{
+    background-color:green;
+}

@@ -1,0 +1,29 @@
+<apex:page standardController="Event" title="Appointment Details" standardStylesheets="false" showHeader="false" sidebar="false">
+<apex:form >
+ <style type="text/css"> 
+ 
+  .literally {
+        width: 260px;  
+        height: 400px; 
+    } 
+    .multiSelectPicklistTable{
+        width:98%;
+    } 
+    .classA{
+        vertical-align:top; 
+        width:27%;
+    }
+    .classD{
+        vertical-align:top;  
+    }
+    .classB{
+        vertical-align:top;
+    } 
+</style>
+ 
+    </apex:form>
+    <div>
+        <h1 class="slds-text-heading--small slds-m-bottom--medium">Appointment Details</h1> 
+    </div>
+    
+</apex:page>

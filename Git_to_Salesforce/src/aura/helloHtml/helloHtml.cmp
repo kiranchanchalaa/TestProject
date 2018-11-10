@@ -1,0 +1,15 @@
+<!--c:helloHtml-->
+<aura:component >
+	<div>
+        Hello, HTML!
+    </div>
+   
+    <h2>check out the tab style in this list</h2>
+   
+    <ul>
+        <li>am green</li>
+        <li>am red</li>
+        <li>am blue</li>
+    </ul>
+     
+</aura:component>

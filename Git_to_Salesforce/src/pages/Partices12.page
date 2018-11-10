@@ -1,0 +1,21 @@
+<apex:page standardController="Account" >
+<!--
+contentType="application/vnd.ms-word" >
+this tag for ms-execel fromot-->
+
+  <!-- This page must be accessed with an Account Id in the URL. For example: 
+       https://<salesforceInstance>/apex/myPage?id=001D000000JRBet -->
+
+    <apex:pageBlock title="Contacts">
+        <html>
+        <div >
+            <apex:pageBlockTable value="{!account.Contacts}" var="contact">
+            <apex:column value="{!contact.Name}"/>
+            <apex:column value="{!contact.MailingCity}"/>
+            <apex:column value="{!contact.Phone}"/>
+        </apex:pageBlockTable>
+            </div>            
+        </html>
+        
+    </apex:pageBlock>
+</apex:page>

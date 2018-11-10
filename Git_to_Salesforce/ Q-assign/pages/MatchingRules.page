@@ -1,0 +1,246 @@
+<apex:page lightningStylesheets="true" standardController="ortoo_qra__Assignment_Group__c" extensions="ortoo_qra.MatchingRuleController">
+	<apex:variable var="uiTheme" value="lightningDesktop" rendered="{!$User.UIThemeDisplayed == 'Theme4d'}">
+		<link href="{!URLFOR($Resource.CustomStyle, 'CustomStyle.css')}" rel="stylesheet" media="screen"/>
+	</apex:variable>
+	<apex:form >
+		<apex:sectionHeader title="QA Member Matching Rule"/>
+		&nbsp;&#171;&nbsp;
+		<apex:outputLink value="/{!assignmentGroupId}">Back to Parent : {!assignmentGroup.Name}</apex:outputLink>
+		<br/><br/>
+		<apex:pagemessages id="pg_msg"/>
+		<apex:pageBlock title="Member Matching Rule" id="matching_rule">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Save" action="{!saveRule}" rendered="{!editIsActive}"/>
+				<apex:commandButton value="Cancel" action="{!cancelRule}" rendered="{!editIsActive}"/>
+				<apex:commandButton value="Edit" action="{!editRule}" rerender="matching_rule" rendered="{!AND(NOT(editIsActive),EditIsAllowed)}"/>
+				<apex:commandButton value="Delete" action="{!deleteRule}" rendered="{!AND(NOT(editIsActive),DeleteIsAllowed)}"/>
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection columns="1"  id="edit_section" rendered="{!editIsActive}">
+				<apex:pageBlockSectionItem helptext="{!ProcessingOrder_HelpText}">
+					<c:customHelpTextLabel labelValue="Id" helpTextID="Id" helpText="{!ProcessingOrder_HelpText}"/>
+					<apex:outputField value="{!matchingRule.ortoo_qra__Processing_Order__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!RulesType_HelpText}">
+					<c:customHelpTextLabel labelValue="Rule Type" helpTextID="Rule_Type" helpText="{!RulesType_HelpText}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!matchingRule.ortoo_qra__Rule_Type__c}" size="1">
+							<apex:selectOptions value="{!RuleTypeOptions}"/>
+							<apex:actionsupport event="onchange" action="{!onchangeRuleType}" rerender="edit_section" status="ruletypestatus"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="ruletypestatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!MatchObject_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="Match Object" helpTextID="Match_Object" helpText="{!MatchObject_HelpText}"/>
+					 <apex:outputPanel >
+					<apex:selectList value="{!matchingRule.ortoo_qra__Member_Lookup_Match_Object__c}" size="1" id="match_object">
+						<apex:selectOptions value="{!MatchObjectOptions}"/>
+						<apex:actionsupport event="onchange" rerender="match_field,edit_section" status="matchobjectstatus"/>
+					</apex:selectList>
+					&nbsp;
+					<apex:actionStatus id="matchobjectstatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+						</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!LookupField_HelpText}" id="lookup_object" rendered="{!AND(islookupobject,ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="{!objectLabel} Lookup Field" helpTextID="lookup_object_label" helpText="{!LookupField_HelpText}"/>
+					 <apex:outputPanel >
+					<apex:selectList id="lookup_object_select"  value="{!matchingRule.ortoo_qra__Member_Lookup_Field_For_Lookup_Object__c}" size="1" >
+						<apex:selectOptions value="{!LookupFieldOptions}"/>
+						<apex:actionsupport event="onchange" rerender="match_field,match_field_label" status="lookupobjectstatus"/>
+					</apex:selectList>
+					&nbsp;
+					<apex:actionStatus id="lookupobjectstatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+						</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!Lookupmatchfield_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="{!LookFieldObjectLabel} Match Field" helpTextID="match_field_label" helpText="{!Lookupmatchfield_HelpText}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!matchingRule.ortoo_qra__Match_Field__c}" size="1" id="match_field">
+							<apex:selectOptions value="{!MatchFieldOptions}"/>
+							<apex:actionsupport event="onchange" action="{!showwarning}" rerender="pg_msg" status="lookupmatchfieldstatus"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="lookupmatchfieldstatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!Operator_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="Operator" helpTextID="Operator" helpText="{!Operator_HelpText}"/>
+					<apex:selectList value="{!matchingRule.ortoo_qra__Operator__c}" size="1">
+						<apex:selectOptions value="{!OperatorOptions}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!MemberMatchField_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="Member Match Field" helpTextID="Member_Match_Field" helpText="{!MemberMatchField_HelpText}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!matchingRule.ortoo_qra__Member_Lookup_User_Match_Field__c}" size="1">
+							<apex:selectOptions value="{!MemberMatchFieldOptions}"/>
+							<apex:actionsupport event="onchange" action="{!showwarning}" rerender="pg_msg" status="membermatchfieldstatus"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="membermatchfieldstatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!MatchField_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					   <c:customHelpTextLabel labelValue="Match Field" helpTextID="Match_Field" helpText="{!MatchField_HelpText}"/>
+					   <apex:outputPanel id="match_field">
+						<apex:selectList value="{!matchingRule.ortoo_qra__Match_Field__c}" size="1">
+							<apex:selectOptions value="{!matchFieldSelectionOptions}"></apex:selectOptions>
+						</apex:selectList>
+					   </apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!LookbackPeriod_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="Lookback Period" helpTextID="Lookback_Period" helpText="{!LookbackPeriod_HelpText}"/>
+					   <apex:outputPanel >
+						<apex:inputText value="{!matchingRule.ortoo_qra__Follow_Me_Units_Of_Time__c}" style="width:50px"/>&nbsp;
+						<apex:selectList value="{!matchingRule.ortoo_qra__Follow_Me_Time_Unit__c}" id="time_unit" size="1">
+							<apex:selectOptions value="{!timeUnitOptions}"></apex:selectOptions>
+						</apex:selectList>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!UpdateField_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="Update Field" helpTextID="Update_Field" helpText="{!UpdateField_HelpText}"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!matchingRule.ortoo_qra__Follow_Me_Update_Field__c}" size="1">
+							<apex:selectOptions value="{!updateFieldSelectionOptions}"></apex:selectOptions>
+							<apex:actionSupport event="onchange" rerender="follow_me_table" action="{!setUpdateFieldChange}" status="fieldnamestatus"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="fieldnamestatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>       
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!UpdateValue_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="Update Value" helpTextID="Update_Value" helpText="{!UpdateValue_HelpText}"/>
+					<apex:outputPanel id="follow_me_table">
+						<apex:inputText value="{!matchingRule.ortoo_qra__Follow_Me_Update_Value__c}" rendered="{!AND(ShowOptionsList == false,fieldCheckbox == false,fieldDateTime == false)}"/>
+						<apex:selectList value="{!matchingRule.ortoo_qra__Follow_Me_Update_Value__c}" size="1" multiselect="false" rendered="{!ShowOptionsList}">
+							<apex:selectOptions value="{!ShowOptions}"></apex:selectOptions>
+						</apex:selectList> 
+						<apex:inputCheckbox value="{!matchingRule.ortoo_qra__Follow_Me_Update_Value__c}" rendered="{!fieldCheckbox}"/>  
+						<apex:inputField value="{!fieldValueDate.ActivityDate}" rendered="{!fieldDateTime}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!ThisDistributionGroupOnly_HelpText}"  rendered="{!NOT(ismemberlookup)}">
+						<c:customHelpTextLabel labelValue="This Distribution Group only" helpTextID="Distribution_Group" helpText="{!ThisDistributionGroupOnly_HelpText}"/>
+						<apex:outputPanel >
+							<apex:inputCheckbox value="{!matchingRule.ortoo_qra__Follow_Me_This_Distribution_Group_only__c}"/>
+						</apex:outputPanel>
+					</apex:pageBlockSectionItem>
+					   <apex:pageBlockSectionItem helpText="{!ComplyWithQuota_HelpText}">
+						<c:customHelpTextLabel labelValue="Ignore Quota" helpTextID="Ignore_Quota" helpText="{!ComplyWithQuota_HelpText}"/>
+						<apex:outputPanel >
+							<apex:inputCheckbox value="{!matchingRule.ortoo_qra__Ignore_Quota__c}"/>
+						</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!ComplyWithCap_HelpText}">
+						<c:customHelpTextLabel labelValue="Ignore Cap" helpTextID="Ignore_Cap" helpText="{!ComplyWithCap_HelpText}"/>
+						<apex:outputPanel >
+							<apex:inputCheckbox value="{!matchingRule.ortoo_qra__Ignore_Cap__c}"/>
+						</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection columns="1" id="view_section" rendered="{!NOT(editIsActive)}">				
+				<apex:pageBlockSectionItem helptext="{!ProcessingOrder_HelpText}">
+					<c:customHelpTextLabel labelValue="Id" helpTextID="Id" helpText="{!ProcessingOrder_HelpText}"/>
+					<apex:outputText value="{!matchingRule.ortoo_qra__Processing_Order__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!RulesType_HelpText}">
+					<c:customHelpTextLabel labelValue="Rule Type" helpTextID="Rule_Type" helpText="{!RulesType_HelpText}"/>
+					<apex:outputText value="{!matchingRule.ortoo_qra__Rule_Type__c}" />
+				</apex:pageBlockSectionItem>
+				<!-- Member Lookup -->
+				<apex:pageBlockSectionItem helptext="{!MatchObject_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="Match Object" helpTextID="Match_Object" helpText="{!MatchObject_HelpText}"/>
+					<apex:outputText value="{!matchingRule.ortoo_qra__Member_Lookup_Match_Object__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!LookupField_HelpText}" rendered="{!AND(islookupobject,ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="{!objectLabel} Lookup Field" helpTextID="Lookup_Field" helpText="{!LookupField_HelpText}"/>
+					<apex:outputText value="{!fieldForLookupObjectDisplay}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!Lookupmatchfield_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="{!LookFieldObjectLabel} Match Field" helpTextID="Match_Field" helpText="{!Lookupmatchfield_HelpText}"/>
+					<apex:outputText value="{!objectMatchFieldDisplay}"/>
+				</apex:pageBlockSectionItem>
+				 <apex:pageBlockSectionItem helptext="{!Operator_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="Operator" helpTextID="Operator" helpText="{!Operator_HelpText}"/>
+					<apex:outputField value="{!matchingRule.ortoo_qra__Operator__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helptext="{!MemberMatchField_HelpText}" rendered="{!ismemberlookup}">
+					<c:customHelpTextLabel labelValue="Member Match Field" helpTextID="Member_Match_Field" helpText="{!MemberMatchField_HelpText}"/>
+					<apex:outputText value="{!memberMatchFieldDisplay}"/>
+				</apex:pageBlockSectionItem>
+				<!-- Follow me -->
+				<apex:pageBlockSectionItem helpText="{!MatchField_HelpText}" rendered="{!NOT(ismemberlookup)}">
+						<c:customHelpTextLabel labelValue="Match Field" helpTextID="Match_Field" helpText="{!MatchField_HelpText}"/>
+						<apex:outputText value="{!objectMatchFieldDisplay}"/>
+					</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!LookbackPeriod_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="Lookback Period" helpTextID="Lookback_Period" helpText="{!LookbackPeriod_HelpText}"/>
+					   <apex:outputPanel >
+						<apex:outputText value="{0,number,integer}" style="width:50px">
+							<apex:param value="{!matchingRule.ortoo_qra__Follow_Me_Units_Of_Time__c}" />
+						</apex:outputText>&nbsp;
+						<apex:outputText value="{!matchingRule.ortoo_qra__Follow_Me_Time_Unit__c}" />
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!UpdateField_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="Update Field" helpTextID="Update_Field" helpText="{!UpdateField_HelpText}"/>
+					<apex:outputText value="{!followMeUpdateFieldDisplay}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!UpdateValue_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="Update Value" helpTextID="Update_Value" helpText="{!UpdateValue_HelpText}"/>
+					<apex:outputText value="{!matchingRule.ortoo_qra__Follow_Me_Update_Value__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!ThisDistributionGroupOnly_HelpText}" rendered="{!NOT(ismemberlookup)}">
+					<c:customHelpTextLabel labelValue="This Distribution Group only" helpTextID="Distribution_Group" helpText="{!ThisDistributionGroupOnly_HelpText}"/>
+					<apex:outputPanel >
+						<apex:outputPanel rendered="{!matchingRule.ortoo_qra__Follow_Me_This_Distribution_Group_only__c}">
+							<img src="/img/checkbox_checked.gif" alt="Checked" width="21" height="16" class="checkImg" title="Checked"/>
+						</apex:outputPanel>
+						<apex:outputPanel rendered="{!NOT(matchingRule.ortoo_qra__Follow_Me_This_Distribution_Group_only__c)}">
+							<img src="/img/checkbox_unchecked.gif" alt="Unchecked" width="21" height="16" class="checkImg" title="Unchecked" />
+						</apex:outputPanel>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!ComplyWithQuota_HelpText}">
+					<c:customHelpTextLabel labelValue="Ignore Quota" helpTextID="Ignore_Quota" helpText="{!ComplyWithQuota_HelpText}"/>
+					<apex:outputPanel >
+					<apex:outputField value="{!matchingRule.ortoo_qra__Ignore_Quota__c}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!ComplyWithCap_HelpText}">
+					<c:customHelpTextLabel labelValue="Ignore Cap" helpTextID="Ignore_Cap" helpText="{!ComplyWithCap_HelpText}"/>
+					<apex:outputPanel >
+					<apex:outputField value="{!matchingRule.ortoo_qra__Ignore_Cap__c}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

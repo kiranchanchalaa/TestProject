@@ -1,0 +1,13 @@
+<apex:page title="customStylePage" standardStylesheets="true" showHeader="false">
+    <style type="text/css" >
+    p{color: #f60; font-weight: bold; weigth:100px}
+    </style>
+    <p>hello applying to the main paragraph </p>   
+     
+   <apex:pageBlock >
+       <apex:outputText styleClass="newlink">
+           this is main page
+       </apex:outputText>
+     
+    </apex:pageBlock>
+</apex:page>

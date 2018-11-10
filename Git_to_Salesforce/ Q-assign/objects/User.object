@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>Assignment_Group_Is_Active__c</fullName>
+        <defaultValue>true</defaultValue>
+        <deprecated>false</deprecated>
+        <description>Specify whether a user is an active member of Q-assign Assignment Groups or not. Only active members can be assigned jobs.</description>
+        <externalId>false</externalId>
+        <inlineHelpText>If checked, user will be enabled for Q-assign Assignment Groups and can be assigned jobs if an active member of a Q-assign Assignment Group. If unchecked, the user will be inactive for Q-assign Assignment Groups and cannot be assigned jobs.</inlineHelpText>
+        <label>Available for Q-Assign</label>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Checkbox</type>
+    </fields>
+</CustomObject>

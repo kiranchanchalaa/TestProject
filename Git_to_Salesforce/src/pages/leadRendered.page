@@ -1,0 +1,9 @@
+<apex:page standardController="lead"  >
+    <apex:form >
+    <apex:pageBlock id="abc" >
+        <apex:pageBlockSection id="abc"  >
+        <apex:outputtext value="{!If(lead.Active_lead__c==true,'yes','no')}" /> 
+        </apex:pageBlockSection>
+       </apex:pageBlock>
+        </apex:form>
+</apex:page>

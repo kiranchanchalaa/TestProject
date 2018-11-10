@@ -1,0 +1,9 @@
+<aura:component >
+    <div class="white" >hello hello!</div>
+    <h2>this is the main values of HTML</h2>
+    <ul>
+        <li class="red" > i am red</li>
+         <li class="blue" > i am red</li>
+         <li class="green" > i am red</li>
+    </ul>
+</aura:component>

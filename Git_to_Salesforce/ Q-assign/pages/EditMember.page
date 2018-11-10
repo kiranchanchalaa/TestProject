@@ -1,0 +1,207 @@
+<apex:page lightningStylesheets="true" controller="ortoo_qra.EditMemberController" sidebar="false" title="Edit Member" showHeader="false" id="thePage">
+	<link href="{!URLFOR($Resource.CustomStyle, 'CustomStyle.css')}" rel="stylesheet" media="screen"/>
+	<script type="text/javascript" src="{!URLFOR($Resource.jquery,'jquery.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.jqueryui,'jquery-ui.min.js')}"></script>
+	<script>
+		function proceed(){
+			var validation_err =  document.getElementById('thePage:error_messages').innerHTML;
+			if(validation_err == '') 
+			{
+				window.opener.location.href="/apex/AssignmentGroup?id={!JSENCODE($CurrentPage.parameters.AG)}";
+				window.top.close();
+			}
+		}
+	</script>
+	<style>
+		.labelCol{
+			width: 40% !important;
+		}
+		.labelCol30{
+			width: 30% !important;
+		}
+		.bPageHeader {
+			display:none;
+		}
+		#contentWrapper {
+			min-width: unset;
+		}
+		body.sfdcBody{
+			background : unset;
+		}
+		.hasMotif {
+			margin: unset;
+		}
+		.noSidebarCell, .sidebarCell .fixed {
+			padding: unset;
+		}
+		.homeTab .brdPalette {
+			border-top-color: unset;
+		}
+		.bodyDiv .outerNoSidebar {
+			padding : unset;
+		}
+		body .bPageBlock, body #bodyCell .bResource .secondaryPalette, body .secondaryPalette.bPageBlock{
+			-moz-border-radius: unset;
+			-webkit-border-radius: unset;
+		}
+		.homeTab .bPageBlock {
+			border-top: unset;
+		}
+		.detailPage .bPageBlock, .editPage .bPageBlock{
+			border-top-width: 7px;
+		}
+		body .bPageBlock {
+			padding : unset;
+			padding-bottom: 9px;
+		}
+		.bPageBlock {
+			border-top:unset: 
+		}
+		body .bPageFooter a, body .bPageFooter {
+			display:none;
+		}
+	</style>
+	<apex:pageMessages id="error_messages"/>
+	<apex:form id="TheForm">
+		<apex:outputPanel id="reRenderedPanelToSetVariable">
+		</apex:outputPanel>
+		<apex:pageBlock title="Member Settings" id="theBlock"  mode="edit">
+            <apex:pageMessages />
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!SaveMember}"   oncomplete="proceed();" rerender="error,error_messages,reRenderedPanelToSetVariable" value="Save"/>
+                <apex:commandButton action="{!CancelEditMember}"  onclick="window.top.close();" value="Cancel" immediate="true"/>
+			</apex:pageBlockButtons>
+			<apex:pageBlockSection columns="1" id="page_pbs" collapsible="false" > 
+                <apex:pageBlockSectionItem helpText="{!MemberEnabled_HelpText}">
+                    <c:customHelpTextLabel labelValue="Enabled" helpTextID="Enabled" helpText="{!MemberEnabled_HelpText}"/>
+                    <apex:outputPanel >
+                    <apex:inputHidden value="{!error_new}" id="error" />
+					<script type="text/javascript">
+						user_error = "{!error_new}";
+					</script>
+					<apex:inputCheckbox style="margin-left: 0px;" value="{!Member.ortoo_qra__Is_Active__c}" > </apex:inputCheckbox>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!MemberAvailable_HelpText}">
+                    <c:customHelpTextLabel labelValue="Available" helpTextID="Available" helpText="{!MemberAvailable_HelpText}"/>
+					<apex:outputPanel >
+						<apex:selectList disabled="{!IF(Member.ortoo_qra__Owner_Type__c == 'Queue',true,false)}" value="{!MemberAvailable}" id="rejected_email_queue" size="1">
+							<apex:selectOptions value="{!YesNoOptions}"></apex:selectOptions>
+						</apex:selectList>
+					</apex:outputPanel> 
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!AssignmentQuota_HelpText}">
+				<apex:outputPanel >
+					<c:customHelpTextLabel labelValue="Assignment Quota" helpTextID="Assignment_Quota" helpText="{!AssignmentQuota_HelpText}"/>
+				</apex:outputPanel>
+				<apex:outputPanel >
+					<apex:outputPanel id="Block1" >
+                        <apex:inputField style="width:45px" rendered="{!IF(Member.ortoo_qra__Assignment_Quota__c != null,true,false)}" value="{!Member.ortoo_qra__Assignment_Quota__c}" />
+                        <apex:inputField style="width:45px" html-disabled="true" rendered="{!IF(Member.ortoo_qra__Assignment_Quota__c == null,true,false)}"  value="{!assignment_group.ortoo_qra__Assignment_Quota__c}" />
+                   </apex:outputPanel>
+                        <apex:outputLabel styleClass="labelCol" value="Override"/>
+                    <apex:inputCheckbox style="margin-left: 0px;"  value="{!AssignmentQuotaDefault}" >
+                        <apex:actionSupport event="onchange" action="{!DefaultAssignmentQuota}" reRender="Block1" status="AssignmentQuota"/>
+                         </apex:inputCheckbox>
+                          <apex:actionStatus id="AssignmentQuota">
+                            <apex:facet name="start">
+                              <img src="/img/loading.gif" />                 
+                            </apex:facet>   
+                        </apex:actionStatus>
+                 </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!GlobalAssignmentQuota_HelpText}">
+                <apex:outputPanel >
+                <c:customHelpTextLabel labelValue="Global Assignment Quota" helpTextID="Global_Assignment_Quota" helpText="{!GlobalAssignmentQuota_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                          <apex:outputPanel id="Block2" >
+                        <apex:inputField style="width:45px" rendered="{!IF(Member.ortoo_qra__Global_Assignment_Quota__c != null,true,false)}" value="{!Member.ortoo_qra__Global_Assignment_Quota__c}" />
+                        <apex:inputField style="width:45px" html-disabled="true" rendered="{!IF(Member.ortoo_qra__Global_Assignment_Quota__c == null,true,false)}"  value="{!assignment_group.ortoo_qra__Global_Assignment_Quota__c}" />
+                    </apex:outputPanel>
+                        <apex:outputLabel styleClass="labelCol" value="Override"/>
+                         <apex:inputCheckbox disabled="{!IF(Member.ortoo_qra__Owner_Type__c == 'Queue',true,false)}" style="margin-left: 0px;"  value="{!GlobalAssignmentQuotaDefault}" >
+                        <apex:actionSupport event="onchange" action="{!DefaultGlobalAssignmentQuota}" reRender="Block2" status="GlobalAssignmentQuota"/>
+                        </apex:inputCheckbox>
+                          <apex:actionStatus id="GlobalAssignmentQuota">
+                            <apex:facet name="start">
+                              <img src="/img/loading.gif" />                 
+                            </apex:facet>   
+                        </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MaxAssignmentCap_HelpText}">
+                <apex:outputPanel >
+               <c:customHelpTextLabel labelValue="Max Assignment Cap" helpTextID="Max_Assignment_Cap" helpText="{!MaxAssignmentCap_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                         <apex:outputPanel id="Block3" >
+                        <apex:inputField style="width:45px" rendered="{!IF(Member.ortoo_qra__Max_Assignment_Cap__c != null,true,false)}" value="{!Member.ortoo_qra__Max_Assignment_Cap__c}" />
+                        <apex:inputField style="width:45px" html-disabled="true" rendered="{!IF(Member.ortoo_qra__Max_Assignment_Cap__c == null,true,false)}"  value="{!assignment_group.ortoo_qra__Assignments_Level__c}" />                    
+                    </apex:outputPanel>
+                        <apex:outputLabel styleClass="labelCol" value="Override"/>
+                     <apex:inputCheckbox style="margin-left: 0px;" value="{!MaxAssignmentCapDefault}" >
+                        <apex:actionSupport event="onchange" action="{!DefaultMaxAssignmentCap}" reRender="Block3" status="MaxAssignmentCap"/>
+                         </apex:inputCheckbox>
+                 <apex:actionStatus id="MaxAssignmentCap">
+                            <apex:facet name="start">
+                              <img src="/img/loading.gif" />                 
+                            </apex:facet>   
+                        </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MaxAssignmentPointsCap_HelpText}">
+                <apex:outputPanel >
+                 <c:customHelpTextLabel labelValue="Max Assignment Points Cap" helpTextID="Max_Assignment_Points_Cap" helpText="{!MaxAssignmentPointsCap_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                      <apex:outputPanel id="Block4" >
+                        <apex:inputField style="width:45px" rendered="{!IF(Member.ortoo_qra__Max_Assignment_Points_Cap__c != null,true,false)}" value="{!Member.ortoo_qra__Max_Assignment_Points_Cap__c}" />
+                        <apex:inputField style="width:45px" html-disabled="true" rendered="{!IF(Member.ortoo_qra__Max_Assignment_Points_Cap__c == null,true,false)}"  value="{!assignment_group.ortoo_qra__Max_Assignment_Points_Cap__c}" />                    
+                    </apex:outputPanel>                        
+                        <apex:outputLabel styleClass="labelCol" value="Override"/>
+                    <apex:inputCheckbox style="margin-left: 0px;"  value="{!MaxAssignmentPointsCapDefault}" >
+                        <apex:actionSupport event="onchange" action="{!DefaultMaxAssignmentPointsCap}" reRender="Block4" status="MaxAssignmentPointsCap"/>
+                         </apex:inputCheckbox>
+                   <apex:actionStatus id="MaxAssignmentPointsCap">
+                            <apex:facet name="start">
+                              <img src="/img/loading.gif" />                 
+                            </apex:facet>   
+                        </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!RoundRobinWeighting_HelpText}">
+					<apex:outputPanel >
+						<c:customHelpTextLabel labelValue="Round-Robin Weighting" helpTextID="Round_Robin_Weighting" helpText="{!RoundRobinWeighting_HelpText}"/>
+						<apex:outputLabel ><span style="color: #4a4a56;font-weight: bold;"> (%) </span></apex:outputLabel> 
+					</apex:outputPanel>
+					<apex:outputPanel >
+						<apex:inputField style="width:45px" rendered="{!IF(assignment_group.ortoo_qra__Assignment_Mode__c == 'Round Robin',true,false)}"  value="{!Member.ortoo_qra__Round_Robin_Weighting__c}" />
+						<apex:inputField style="width:45px" html-disabled="true"  rendered="{!IF(assignment_group.ortoo_qra__Assignment_Mode__c != 'Round Robin',true,false)}"  value="{!Member.ortoo_qra__Round_Robin_Weighting__c}" />
+					</apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!workingHours_HelpText}">
+                <c:customHelpTextLabel labelValue="Working / Shift Hours" helpTextID="Working_Shift_Hours" helpText="{!workingHours_HelpText}"/>
+                <apex:selectList size="1" value="{!user_settings.ortoo_qra__Working_Hours__c}">
+                    <apex:actionSupport event="onchange" rerender="page_pbs"/>
+                    <apex:selectOption itemValue="24/7" itemLabel="24/7"/>
+                    <apex:selectOption itemValue="Business Hours" itemLabel="Business Hours" />
+                </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="Choose business hours for this user" rendered="{!user_settings.ortoo_qra__Working_Hours__c == 'Business Hours'}">
+                    <c:customHelpTextLabel labelValue="Business Hours" helpTextID="Business_Hours" helpText="{!BusinessHours_HelpText}"/>
+                    <apex:PanelGrid columns="5" >
+                        <apex:selectList value="{!user_settings.ortoo_qra__WO_Business_Hours__c}" id="business_hours" size="1">
+                            <apex:selectOptions value="{!businessHoursOptions}"></apex:selectOptions>
+                        </apex:selectList>
+                        <apex:commandLink rerender="page_pbs">
+							<apex:image value="{!$Resource.ortoo_qra__Refresh}" height="15px" width="15px" title="Refresh Business Hours List"/>
+                        </apex:commandLink>
+                        &nbsp;&nbsp;
+                        <apex:commandLink onclick="window.open('/01m/e');return false;" value="New Business Hours" />
+                    </apex:PanelGrid>   
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+		</apex:pageBlock> 
+	</apex:form>
+</apex:page>

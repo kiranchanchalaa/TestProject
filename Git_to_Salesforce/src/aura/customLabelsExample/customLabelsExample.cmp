@@ -1,0 +1,20 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="LabelController" >
+   <!--  <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="mylabel" type="string"/>
+    {!v.mylabel}
+    Passing in Label Values -->
+    <aura:attribute name="mylabel" type="String" default=" hello passing labelvalues "/>
+    <lightning:input name="mytext" label="{!v.mylabel}"/>
+    
+    <aura:attribute name="_label" type="string" default="i am from parent label"/>
+    <lightning:button label="set label" aura:id="button1" onclick="{!c.setLabel}"/>
+    <!-- <auradocs:inner aura:id="inner" label="{!v._label}"/>--><br/>
+    <ui:outputDateTime value="2013-10-07T00:17:08.997Z" timezone="Europe/Berlin" />
+    
+    <!--<Localization-time date settings>-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit1}"/><br/>
+    <aura:attribute name="datetime" type="DateTime"/><br/>
+    <lightning:formattedDateTime value="{!v.datetime}" timeZone="Europe/Berlin" 
+                                 year="numeric" month="short" day="2-digit" hour="2-digit"
+                                 minute="2-digit" second="2-digit"/>
+</aura:component>

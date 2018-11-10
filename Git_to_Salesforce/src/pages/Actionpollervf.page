@@ -1,0 +1,10 @@
+<apex:page controller="Actionpoller" standardStylesheets="false" showHeader="false"  >
+    <apex:form >
+    <apex:pageBlock >
+        <apex:pageBlockSection title="Example">
+        <apex:actionPoller action="{!startcounting}" reRender="display" interval="10" />
+            <apex:outputText value="{!name}" label="user name with intervel" id="display"/>
+        </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

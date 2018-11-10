@@ -1,0 +1,18 @@
+<apex:page controller="accoptycon" >
+<apex:pageBlock >    
+    <apex:pageBlockTable value="{!accopty}" var="a">
+      <apex:column value="{!a.name}"/>
+        <td>
+            
+        <apex:repeat value="{!a.contacts}" var="b">
+            <apex:column value="{!b.lastname}" />
+            </apex:repeat>
+        </td>
+        <td>
+         <apex:repeat value="{!a.Opportunities}" var="c">
+            <apex:column value="{!c.id}"/>
+            </apex:repeat>
+        </td>
+    </apex:pageBlockTable> 
+</apex:pageBlock>
+</apex:page>

@@ -1,0 +1,16 @@
+<aura:component implements="flexipage:availableForAllPageTypes">
+    <ltng:require styles="{!$Resource.SLDSv1 + '/assets/styles/lightning-design-system-ltng.css'}"
+
+        scripts="{!$Resource.jsLibraries + '/jsLibOne.js'}"
+
+        afterScriptsLoaded="{!c.scriptsLoaded}" />
+    <aura:attribute name="aval" type="integer" required="true"/>
+    <aura:attribute name="bval" type="integer" required="true"/>
+    <aura:attribute name="cval" type="integer"/>
+    <aura:handler name="init" value="{!this}" action="{!c.add}"/>
+	<div>
+        Aval:{!aval}
+        Bval:{!bval}
+        Cval:{!cval}
+    </div>
+</aura:component>

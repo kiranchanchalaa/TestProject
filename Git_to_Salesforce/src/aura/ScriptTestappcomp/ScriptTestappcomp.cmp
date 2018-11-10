@@ -1,0 +1,15 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="ammu" type="string" default="default value"/>
+    <aura:handler name="init" value="{!this}" action="{!c.hello}"/>
+    
+    <p>This value is set in the controller after the component initializes and before rendering.</p>
+    <p><b>{!v.ammu}</b></p>
+    <ltng:require scripts="{!$Resource.counter1}"
+                  afterScriptsLoaded="{!c.getValue}"/>
+    <aura:attribute name="value" type="Integer"/>
+    
+    <h1>MyCounter</h1>
+    <p>{!v.value}</p>
+    <lightning:button label="Get Value" onclick="{!c.getValue}"/>
+    <lightning:button label="Increment" onclick="{!c.increment}"/>
+</aura:component>

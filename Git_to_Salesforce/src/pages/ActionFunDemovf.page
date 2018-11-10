@@ -1,0 +1,26 @@
+<apex:page controller="ActionFunDemo">
+    <apex:form >
+    <apex:actionFunction name="statuschange" action="{!statuschanged}" reRender="Display" /> 
+        <apex:actionFunction name="contactstatus" action="{!ContactStatus}" reRender="Display1" />
+        <apex:actionFunction name="optystatus" action="{!optystatus}" reRender="Silu" />
+         <apex:pageBlock >
+        <apex:pageBlockSection title="if you willselect showtextbox then text box will be shown" id="Display">
+            <apex:inputField value="{!acc.Active__c}" onchange="statuschange()"/>
+              <apex:inputField value="{!acc.SIC}" rendered="{!showtxt}" />
+            </apex:pageBlockSection>
+         </apex:pageBlock>
+        <apex:pageBlock >
+        <apex:pageBlockSection title="If you select the the leadsorce new field will be showing" id="Display1">
+        <apex:inputField value="{!con.LeadSource}" onchange="contactstatus()"/>
+            <apex:inputField value="{!con.Phone}" rendered="{!showtxt}"/>
+            <apex:inputField value="{!con.lastname}" rendered="{!showtxt}"/>
+        </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock >
+        <apex:pageBlockSection title="if you select as the opty stange name next field will be show" id="Silu">
+            <apex:inputField value="{!opty.StageName}" onchange="optystatus()"/>
+            <apex:inputField value="{!opty.AccountID}" rendered="{!showtxt}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

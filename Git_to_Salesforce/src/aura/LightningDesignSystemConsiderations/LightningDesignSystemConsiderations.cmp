@@ -1,0 +1,47 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <lightning:button name="submit" label="Submit" class="slds-button slds-m-top_medium"/><br/>
+    <button class="slds-button slds-button_brand slds-m-around_medium"    
+        type="button" name="submit">Submit</button>
+    <lightning:button label="checkspacing" class="slds-button_brand"/>
+    <div class="slds-align_absolute-center" style="height: 5rem;">
+        This content will be positioned in the absolute center of its container
+    </div>
+    
+    <div class="slds-box">
+<p>This is a regular-sized box.</p> 
+</div>
+    <lightning:button class="slds-button_neutral" label="Base" onclick="{! c.handleClick }"/>
+    
+    <!-- lightning:card example using slds-p-horizontal_small class -->
+<lightning:card >
+  <aura:set attribute="title">My Account</aura:set>
+  <aura:set attribute="footer">Footer</aura:set>
+  <aura:set attribute="actions">
+    <lightning:button label="New"/>
+  </aura:set>
+  <p class="slds-p-horizontal_small">
+    Card Body
+  </p>
+    </lightning:card><br/>
+    
+    <!-- lightning:card example using slds-card__body_inner -->
+<lightning:card >
+    <aura:set attribute="title">My Account</aura:set>
+    <aura:set attribute="footer">Footer</aura:set>
+    <aura:set attribute="actions">
+      <lightning:button label="New"/>
+    </aura:set>
+    <div class="slds-card__body_inner">
+      Card Body
+    </div>
+</lightning:card>  
+     <ul class="slds-has-dividers_around-space">
+    <li class="slds-item">
+      <lightning:tile label="Anypoint Connectors" href="https://ammukiran-dev-ed.lightning.force.com/one/one.app#/setup/SetupOneHome/home" class="slds-tile_board">
+          <p class="slds-text-heading_medium">$500,000</p>
+          <p class="slds-truncate" title="Company One"><a href="#">Company One</a></p>
+          <p class="slds-truncate">Closing 9/30/2015</p>
+       </lightning:tile>
+    </li>
+  </ul>
+</aura:component>

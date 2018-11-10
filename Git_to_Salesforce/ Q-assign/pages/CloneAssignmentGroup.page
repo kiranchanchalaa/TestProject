@@ -1,0 +1,46 @@
+<apex:page lightningStylesheets="true" standardController="ortoo_qra__Assignment_Group__c" extensions="ortoo_qra.CloneAssignmentGroupController" id="thePage" title="Clone Assignment Group" sidebar="false" showheader="false">
+
+    <apex:form id="TheForm">
+    	<apex:outputPanel id="reRenderedPanelToSetVariable">
+	    	<script type="text/javascript">
+		    	var new_assignmnet_group_Id = "{!newAssignmentGroupId}";
+		    	var error_msg = "{!errorMessage }";
+		   	</script>
+	   	</apex:outputPanel>
+        <apex:pageBlock title="Clone Assignment Group" id="pageEdit" mode="edit">
+            <apex:pageBlockButtons location="Bottom">
+                <apex:commandButton action="{!cloneGroup}" oncomplete="closePopUp();" value="Save" rerender="reRenderedPanelToSetVariable"/>
+                <apex:commandButton value="Cancel" onclick="closePopUp();"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="1"> 
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Group Name"/>
+                    <apex:inputText value="{!assignmentGroupName}" style="width:300px;"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <script type="text/javascript">
+        function closePopUp(){
+            
+            //alert(new_assignmnet_group_Id);
+            if(error_msg != undefined && error_msg != '')
+            {
+            	alert('Error: '+error_msg);	
+            }
+            else
+            {
+	            if(new_assignmnet_group_Id != undefined && new_assignmnet_group_Id != '')
+	            {
+	                window.opener.location.href="/apex/AssignmentGroup?id="+new_assignmnet_group_Id;
+	                window.top.close();
+	            }
+	            else
+	            {
+	               window.opener.location.href="/apex/AssignmentGroup?id={!$CurrentPage.parameters.id}";
+	               window.top.close();
+	            }
+            }
+        }
+    </script>
+</apex:page>

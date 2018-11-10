@@ -1,0 +1,1592 @@
+<apex:page lightningStylesheets="true" standardController="ortoo_qra__Assignment_Group__c" extensions="ortoo_qra.AssignmentGroupExtension" id="thePage" title="Assignment Groups" action="{!PageInit}">
+    <script type="text/javascript" src="{!URLFOR($Resource.jquery,'jquery.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.jqueryui,'jquery-ui.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.bootstrapforMultiSelect,'bootstrapforMultiSelect/js/bootstrap.min.js')}"></script>
+    
+    <link href="{!URLFOR($Resource.bootstrapforMultiSelect, 'bootstrapforMultiSelect/css/bootstrap.min.css')}" rel="stylesheet" media="screen"/>
+    <link href="{!URLFOR($Resource.multiselect, 'multiselect/css/multi-select.css')}" rel="stylesheet" media="screen"/>
+    <apex:variable var="uiTheme" value="lightningDesktop" rendered="{!$User.UIThemeDisplayed == 'Theme4d'}">
+		<link href="{!URLFOR($Resource.CustomStyle, 'CustomStyle.css')}" rel="stylesheet" media="screen"/>
+	</apex:variable>
+    <apex:form id="theForm">
+    	<script type="text/javascript">
+    		
+	        function selectAllCheckboxes( obj, receivedInputID )
+	        {
+	            var inputCheckBox = document.getElementsByTagName( "input" );
+	            for ( var i = 0; i < inputCheckBox.length; i++ )
+	            {
+	                if ( inputCheckBox[ i ].id.indexOf( receivedInputID ) != -1 )
+	                {
+	                    inputCheckBox[ i ].checked = obj.checked;
+	                }
+	            } 
+	        }
+	        function updateParentCheckbox( obj, parentID )
+	        {
+	            if ( obj.checked == false )
+	            {
+	                var inputCheckBox = document.getElementsByTagName( "input" );
+	                {
+	                    if( inputCheckBox[ i ].id.indexOf( parentID ) != -1 )
+	                    {
+	                        inputCheckBox[ i ].checked = false;
+	                        
+	                        	                    }
+	                }
+	            }
+	        }
+	        function clearParentCheckbox( parentID )
+	        {
+	            var inputCheckBox = document.getElementsByTagName( "input" );
+	            for ( var i = 0; i < inputCheckBox.length; i++ )
+	            {
+	                if( inputCheckBox[ i ].id.indexOf( parentID ) != -1 )
+	                {
+	                    inputCheckBox[ i ].checked = false;
+	                    break;
+	                }
+	            }
+	        }
+	        function warnNoneSelected( receivedInputID )
+	        {
+	            var inputCheckBox = document.getElementsByTagName( "input" );
+	            for ( var i = 0; i < inputCheckBox.length; i++ )
+	            {
+	                if ( inputCheckBox[ i ].id.indexOf( receivedInputID ) != -1 )
+	                {
+	                    if ( inputCheckBox[ i ].checked )
+	                    {
+	                        return true;
+	                    }
+	                }
+	            }
+	            window.alert('Please select at least one row.');
+	            return false;
+	        }
+        
+    		
+    		function JSOnchangefunction()
+			{
+			   if (!window.confirm('All settings will reset on object change.\n\nAre you sure?'))
+		           {
+		           	
+		           	rerenderfunc();
+		           	 
+		           }
+		           else
+		           {
+		               ObjectChanged();
+		                
+		           }
+			}
+			function customObjectJSOnchangefunction()
+			{
+			   if (!window.confirm('All settings will reset on object change.\n\nAre you sure?'))
+		           {
+		           	
+		           	rerenderfunc();
+		           	 
+		           }
+		           else
+		           {
+		               CustomObjectChanged();
+		                
+		           }
+			}
+    	</script>
+    	<style>
+			.ms-container
+			{
+				width:250px; !important;
+			}
+			.inner_container
+			{
+				margin-top: 25px;
+				margin-left: 15px;
+				margin-right: 15px;
+				margin-bottom: 25px;
+			}
+			.fieldSelectionPopup
+			{
+				background-color: white;
+				border-width: 2px;
+				border-style: solid;
+				border-radius: 25px;
+				border-color: #666;
+				z-index: 9999;
+				padding:10px;
+				position: fixed ;
+				top: 50%;
+				left: 50%;
+				width: Auto;
+				-webkit-transform: translate(-50%, -50%);
+				-moz-transform: translate(-50%, -50%);
+				-ms-transform: translate(-50%, -50%);
+				-o-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			.fieldSelectionPopupBackground
+			{
+				background-color:black;
+				opacity: 0.20;
+				filter: alpha(opacity = 20);
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+				z-index: 9998;
+			}
+			.fieldSelectionLoader
+			{
+				line-height: 12px;
+				width: 18px;
+				font-size: 8pt;
+				font-family: tahoma;
+				margin-top: 25px;
+				margin-right: 10px;
+				position:absolute;
+				top:0;
+				right:0;
+			}
+			html, body
+			{
+				height: 100%;
+			}
+			.responsive-table
+			{
+				overflow-x: auto;
+				width: 1047px;
+			}
+			.headerRow
+			{
+				max-width: 70px !important;word-wrap: break-word !important;white-space: normal !important; vertical-align: top !important ;
+			}
+			.list td, .list th, body.oldForecast .list .last td, body.oldForecast .list .last th 
+			{
+				padding: 20px 2px 20px 5px;
+			}
+			span.tooltip
+			{
+				width: 195px;
+			}
+			span.tooltip:hover
+			{
+				/*background: #ffffff;*/
+				text-decoration: none;
+			} /*BG color is a must for IE6*/
+			span.tooltip span
+			{
+				display: none;
+				padding: 2px 3px;
+				margin-left: 8px;
+				/*width: 195px;*/
+			}
+			span.tooltip:hover span
+			{
+				display: inline;
+				position: absolute;
+				z-index: 444;
+				border: 1px solid orange;
+				background: #fefdb9;
+				color: #000000;
+			}			
+		</style>
+		<apex:sectionHeader title="Assignment Group {!SectionHeaderEditTitle}" subtitle="{!ortoo_qra__Assignment_Group__c.Name}"/>
+        <apex:pageBlock title="Assignment Group Detail" id="pageView" rendered="{!EditIsNotActive && (ShowMembersOnly == false)}">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Edit" action="{!EditAssignmentGroup}" rendered="{!EditIsAllowed}"/>
+                <apex:commandButton value="Delete" action="{!DeleteGroup}" onclick="if (!window.confirm('Are you sure?')) return false;" rendered="{!DeleteIsAllowed}"/>
+                <apex:commandButton value="Clone" rendered="{!CreateIsAllowed}" onclick="window.open('/apex/CloneAssignmentGroup?id={!ortoo_qra__Assignment_Group__c.Id}', 'mywindow','height=450,width=650,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');return false;" />
+            </apex:pageBlockButtons>
+             <apex:pageBlockSection columns="2" collapsible="false" title="Assignment Group Details">
+                <apex:pageBlockSectionItem helpText="{!GroupName_HelpText}">
+                    <c:customHelpTextLabel labelValue="Group Name" helpTextID="GroupName" helpText="{!GroupName_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.Name}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!Owner_HelpText}">
+                    <c:customHelpTextLabel labelValue="Owner" helpTextID="Owner" helpText="{!Owner_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:outputLink value="/{!ortoo_qra__Assignment_Group__c.Owner.Id}">{!ortoo_qra__Assignment_Group__c.Owner.Name}</apex:outputLink>&nbsp;
+                            <apex:outputLink value="/{!ortoo_qra__Assignment_Group__c.Id}%2Fa?retURL=/apex/ortoo_qra__AssignmentGroup?id={!ortoo_qra__Assignment_Group__c.Id}" rendered="{!ChangeOwnerIsRendered}">[Change]</apex:outputLink>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!GroupDescription_HelpText}">
+                    <c:customHelpTextLabel labelValue="Description" helpTextID="Description" helpText="{!GroupDescription_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Description__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!CreatedBy_HelpText}" >
+                    <c:customHelpTextLabel labelValue="Created By" helpTextID="created_by" helpText="{!CreatedBy_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:outputLink id="created_by" value="/{!ortoo_qra__Assignment_Group__c.CreatedBy.Id}">{!ortoo_qra__Assignment_Group__c.CreatedBy.Name}</apex:outputLink>,&nbsp;
+                        <apex:outputField value="{!ortoo_qra__Assignment_Group__c.CreatedDate}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!ObjectName_HelpText}">
+                    <c:customHelpTextLabel labelValue="Object" helpTextID="Object" helpText="{!ObjectName_HelpText}"/>
+                    <apex:outputText value="{!ObjectLabel}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!LastModifiedBy_HelpText}" >
+                    <c:customHelpTextLabel labelValue="Last Modified By" helpTextID="modified_by" helpText="{!LastModifiedBy_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:outputLink id="modified_by" value="/{!ortoo_qra__Assignment_Group__c.ortoo_qra__Config_Last_Updated_By__c}">{!configLastUpdatedByUserName}</apex:outputLink>,&nbsp;
+                        <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Config_Last_Updated_Date__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ProcessingOrder_HelpText}">
+                    <c:customHelpTextLabel labelValue="Processing Order" helpTextID="Processing_Order" helpText="{!ProcessingOrder_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Processing_Order__c}"/>
+                </apex:pageBlockSectionItem>
+               	<apex:pageBlockSectionItem helpText="{!LoggedInUser_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assign To Logged In Users Only" helpTextID="Assign_Users" helpText="{!LoggedInUser_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_To_Logged_In_Users__c}" />
+				</apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ProcessingType_HelpText}">
+                    <c:customHelpTextLabel labelValue="Processing Type" helpTextID="Processing_Type" helpText="{!ProcessingType_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Processing_Type__c}"/>
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!NOT(ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_To_Logged_In_Users__c)}"/>
+                <apex:pageBlockSectionItem helpText="{!ActivityTimeout_HelpText}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_To_Logged_In_Users__c}">
+                    <c:customHelpTextLabel labelValue="Activity Timeout" helpTextID="Activity_Timeout" helpText="{!ActivityTimeout_HelpText}"/>
+	            	<apex:outputPanel >
+	                	<apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Activity_Timeout__c}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Activity_Timeout__c != 0}"/>
+	                	<apex:outputText value=" minutes" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Activity_Timeout__c != 0}"/>
+	                	<apex:outputText value="Not Configured" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Activity_Timeout__c == 0}"/>
+	                </apex:outputPanel>
+				</apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!PullButton_HelpText}">
+                    <c:customHelpTextLabel labelValue="Show Pull button to members" helpTextID="Show_Pull_button_members" helpText="{!PullButton_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Show_Pull_Button__c}"/>
+                 </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!UserShiftHoursOnly_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assign to users in their Working/Shift Hours only" helpTextID="shift" helpText="{!UserShiftHoursOnly_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_Users_in_Working_Shift_Hours_Only__c}" />
+				</apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!WorkingHoursSchedule_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assignment Hours Schedule" helpTextID="Schedule_hour" helpText="{!WorkingHoursSchedule_HelpText}"/>
+                	<apex:outputPanel >
+                	<apex:outputLink value="/{!ortoo_qra__Assignment_Group__c.ortoo_qra__Business_Hours_Schedule__c}">
+                    	<apex:outputText value="{!workingHoursScheduleName}"/>
+                    </apex:outputLink>
+                    	&nbsp;<apex:outputText value="[Business Hours not active]" rendered="{!businessHoursIsActive==false}" style="color:red;"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!IsEnabled_HelpText}">
+                    <c:customHelpTextLabel labelValue="Enabled" helpTextID="Enabled" helpText="{!IsEnabled_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Is_Active__c}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ActiveOutsideWorkingHours_HelpText}" >
+                    <c:customHelpTextLabel labelValue="Active only outside working hours" helpTextID="Active_oustside" helpText="{!ActiveOutsideWorkingHours_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Active_Only_Outside_Working_Hours__c}"/>
+                 </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!IsActive_HelpText}">
+                    <c:customHelpTextLabel labelValue="Active" helpTextID="Active" helpText="{!IsActive_HelpText}"/>
+					<apex:outputPanel >
+					&nbsp;
+                	<apex:image value="{!$Resource.ortoo_qra__green_spot}" title="Assignment group is active" rendered="{!assignmentGroupIsActive == true}"/>
+                	<apex:image value="{!$Resource.ortoo_qra__red_spot}" title="Assignment group is inactive" rendered="{!assignmentGroupIsActive == false}"/>
+                       </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                     <apex:pageBlockSectionItem helpText="{!ObjectOwnerField_HelpText}">
+						<c:customHelpTextLabel labelValue="Object Owner Field" helpTextID="Object_Owner" helpText="{!ObjectOwnerField_HelpText}"/>
+                         <apex:outputText value="{!ObjectOwnerFieldLabel}"/>
+                     </apex:pageBlockSectionItem>
+               </apex:pageBlockSection>
+			   <apex:pageBlockSection columns="1" collapsible="false" title="{!ObjectLabel} Selection Rules">
+            	 <apex:pageBlockSectionItem helpText="{!QueueName_HelpText}">
+            	    <c:customHelpTextLabel labelValue="Source {!sourceName}" helpTextID="Source" helpText="{!QueueName_HelpText}"/>
+            	 		 <apex:outputPanel >
+            	 		 	 <apex:outputText value="{!QueueType}"/>
+            	 		 	  :&nbsp;
+                   			 <apex:outputLink value="/p/own/Queue/d?id={!ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Id__c}&setupid=Queues" rendered="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Type__c=='QUEUE',true,false)}">
+                       	 		<apex:outputText value="{!QueueName}"/>
+                   			 </apex:outputLink>
+                   			 <apex:outputLink value="/{!ortoo_qra__Assignment_Group__c.ortoo_qra__User_Id__c}" rendered="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Type__c=='USER',true,false)}">
+                       	 		<apex:outputText value="{!QueueName}"/>
+                   			 </apex:outputLink>
+            	 	</apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!SelectionCriteria_HelpText}">
+                    <c:customHelpTextLabel labelValue="Selection Criteria" helpTextID="Selection_Criteria" helpText="{!SelectionCriteria_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:pageBlockTable value="{!SelectionCriteriaListDisplay}" var="SCItem">
+                            <apex:column >
+                                <apex:outputText value="{!SCItem.Order}"/>
+                            </apex:column>
+                            <apex:column headerValue="Field">
+                                <apex:outputText value="{!SCItem.FieldLabel}"/>
+                            </apex:column>
+                            <apex:column headerValue="Operator">
+                                <apex:outputText value="{!SCItem.crit.ortoo_qra__Operator__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Value">
+                                <apex:outputText value="{!SCItem.FieldValueLabel}"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!QSCFilterLogic_HelpText}">
+                  <c:customHelpTextLabel labelValue="Selection Criteria Filter Logic" helpTextID="Selection_Criteria" helpText="{!QSCFilterLogic_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__QSC_Filter_Logic__c}"/>
+                 </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentMethodBasis_HelpText}">
+                    <c:customHelpTextLabel labelValue="Selection Order Field 1" helpTextID="Selection_Order" helpText="{!AssignmentMethodBasis_HelpText}"/>
+                    <apex:outputPanel >
+                    	<apex:outputText value="{!assignmentMethodBasisLabel}"/>&nbsp;-&nbsp;&nbsp;<apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method__c}"/>
+                    </apex:outputPanel>                    
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentMethodBasis_HelpText}" rendered="{!NOT(ISNULL(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis2__c))}">
+                    <c:customHelpTextLabel labelValue="Selection Order Field 2" helpTextID="Selection_Order2" helpText="{!AssignmentMethodBasis_HelpText}"/>
+                     <apex:outputPanel >
+                    	<apex:outputText value="{!assignmentMethodBasis2Label}"/>&nbsp;-&nbsp;&nbsp;<apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method2__c}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentMethodBasis_HelpText}" rendered="{!NOT(ISNULL(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis3__c))}">
+                    <c:customHelpTextLabel labelValue="Selection Order Field 3" helpTextID="Selection_Order3" helpText="{!AssignmentMethodBasis_HelpText}"/>
+                    <apex:outputPanel >
+                    	<apex:outputText value="{!assignmentMethodBasis3Label}"/>&nbsp;-&nbsp;&nbsp;<apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method3__c}" />
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="false" title="Assignment Rules">
+            	<apex:pageBlockSectionItem helpText="{!AssignmentMode_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assignment Mode" helpTextID="Assignment_Mode" helpText="{!AssignmentMode_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c}"/>
+				</apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MinimumScore_HelpText}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c == 'Points Based - Highest Points'}">
+                    <c:customHelpTextLabel labelValue="Minimum Score Threshold" helpTextID="Minimum_Score" helpText="{!MinimumScore_HelpText}"/>
+                    <apex:outputText value="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Point_Score_Threshold__c == '', 'no minimum', ortoo_qra__Assignment_Group__c.ortoo_qra__Point_Score_Threshold__c)}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MaximumScore_HelpText}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c == 'Points Based - Lowest Points'}">
+                    <c:customHelpTextLabel labelValue="Maximum Score Threshold" helpTextID="Maximum_Score" helpText="{!MaximumScore_HelpText}"/>
+                    <apex:outputText value="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Point_Score_Threshold__c == '', 'no maximum', ortoo_qra__Assignment_Group__c.ortoo_qra__Point_Score_Threshold__c)}"/>
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!AssignmentQuota_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Assignment Quota" helpTextID="Assignment_Quota" helpText="{!AssignmentQuota_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!QuotaPeriod_HelpText}">
+                    <c:customHelpTextLabel labelValue="Quota Period" helpTextID="Quota_Period" helpText="{!QuotaPeriod_HelpText}"/>
+                    <apex:outputText value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Round_Robin_Quota_Period__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!GlobalAssignmentQuota_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Global Assignment Quota" helpTextID="Global_Assignment_Quota" helpText="{!GlobalAssignmentQuota_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!GlobalAssignmentQuotaPeriod_HelpText}">
+                    <c:customHelpTextLabel labelValue="Global Assignment Quota Period" helpTextID="Global_Period" helpText="{!GlobalAssignmentQuotaPeriod_HelpText}"/>
+                    <apex:outputText value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota_Period__c}"/>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!AssignmentsLevel_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Max Assignment Cap" helpTextID="Max_Assignment_Cap" helpText="{!AssignmentsLevel_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!LoadPointsField_HelpText}">
+                    <c:customHelpTextLabel labelValue="Load Points Field" helpTextID="Load_Points_Field" helpText="{!LoadPointsField_HelpText}"/>
+                    <apex:outputText value="{!loadPointFieldLabel}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MaxAssignmentPointsCap_HelpText}" rendered="{!IF(showMaxAssignmentPointsCap == true,true,false)}">
+	                    <c:customHelpTextLabel labelValue="Max Load Points Cap" helpTextID="Max_Assignment_Points_Cap_Label" helpText="{!MaxAssignmentPointsCap_HelpText}"/>
+	                     <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c}" />
+	             </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ActiveCriteria_HelpText}">
+                    <c:customHelpTextLabel labelValue="Active Record Criteria" helpTextID="Active_Record_Criteria" helpText="{!ActiveCriteria_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:pageBlockTable value="{!ActiveCriteriaListDisplay}" var="ACItem">
+                            <apex:column >
+                                <apex:outputText value="{!ACItem.Order}"/>
+                            </apex:column>
+                            <apex:column headerValue="Field">
+                                <apex:outputText value="{!ACItem.FieldLabel}"/>
+                            </apex:column>
+                            <apex:column headerValue="Operator">
+                                <apex:outputText value="{!ACItem.crit.ortoo_qra__Operator__c}"/>
+                            </apex:column>
+                            <apex:column headerValue="Value">
+                                <apex:outputText value="{!ACItem.FieldValueLabel}"/>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ARCFilterLogic_HelpText}">
+                  <c:customHelpTextLabel labelValue="Active Record Criteria Filter Logic" helpTextID="Active_Record_Criteria_Filter_Logic" helpText="{!ARCFilterLogic_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__ARC_Filter_Logic__c}"/>
+                 </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ResponseTime_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Auto Refresh Member Stats (in seconds)" helpTextID="Auto_Refresh_Member" helpText="{!ResponseTime_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c}"/>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helpText="{!MatchingRulesFilterLogic_HelpText}">
+                    <c:customHelpTextLabel labelValue="Matching Rules Filter Logic" helpTextID="Matching_Rules_Filter_Logic" helpText="{!MatchingRulesFilterLogic_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Matching_Rule_Filter_Logic__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!RunMatchingRulesOnly_HelpText}">
+                    <c:customHelpTextLabel labelValue="Enforce Member Matching Rules" helpTextID="Enforce_Member_Matching_Rules" helpText="{!RunMatchingRulesOnly_HelpText}"/>
+                    <apex:outputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Run_Matching_Rules_Only__c}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>            
+        </apex:pageBlock>
+
+        <apex:pageblock title="Member Matching Rules" id="matching_rule_related_list" rendered="{!EditIsNotActive && (ShowMembersOnly == false)}">
+           	<apex:pageBlockButtons location="top" >
+           		<apex:commandButton value="New" action="{!createNewMatchingRule}" rendered="{!RuleCreateIsAllowed}"/>
+           	</apex:pageBlockButtons>
+           	<apex:pageBlockTable value="{!matchingRuleList}" var="rule">
+           		<apex:column rendered="{!OR(RuleEditIsAllowed,RuleDeleteIsAllowed)}">
+	         		<apex:facet name="header" >Action</apex:facet>
+	            	<apex:commandLink value="Edit" action="{!openEditRulePage}" rendered="{!RuleEditIsAllowed}">
+	           		<apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+	              	</apex:commandLink> &nbsp; | &nbsp;
+	              	<apex:commandLink value="Del" rendered="{!RuleDeleteIsAllowed}" action="{!deleteMatchingRule}"  onclick="if (!window.confirm('Are you sure?')) return false;" rerender="matching_rule_related_list">
+	           		<apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/> 
+	          		</apex:commandLink>&nbsp; &nbsp;
+              	</apex:column>	
+              	<apex:column headerValue="Id">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.matchingRule.ortoo_qra__Processing_Order__c}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+              	</apex:column>
+              	<apex:column headerValue="Rule Type">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.matchingRule.ortoo_qra__Rule_Type__c}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+              	</apex:column>
+              	<apex:column headerValue="Match Object">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.matchingRule.ortoo_qra__Member_Lookup_Match_Object__c}" rendered="{!rule.ismemberlookup}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+                   	<apex:outputText rendered="{!NOT(rule.ismemberlookup)}" value="n/a"/>
+              	</apex:column>
+              	<apex:column headerValue="Match Field">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.ObjectMatchFieldDisplay}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+              	</apex:column>
+              	<apex:column headerValue="Operator">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.operatorValue}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+              	</apex:column>
+              	<apex:column headerValue="Member Match Field">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.memberMatchFieldDisplay}" rendered="{!rule.ismemberlookup}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+                   	<apex:outputText rendered="{!NOT(rule.ismemberlookup)}" value="n/a"/>
+              	</apex:column>
+              	<apex:column headerValue="Lookback Period">
+					<apex:commandLink action="{!openViewRulePage}" rendered="{!NOT(rule.ismemberlookup)}">
+						<apex:outputText value="{0,number,integer}">
+	                    <apex:param value="{!rule.matchingRule.ortoo_qra__Follow_Me_Units_Of_Time__c}" />
+	                    </apex:outputText>&nbsp;{!rule.matchingRule.Follow_Me_Time_Unit__c}
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+                   	<apex:outputText rendered="{!rule.ismemberlookup}" value="n/a"/>
+              	</apex:column>
+              	<apex:column headerValue="Update Field">
+					<apex:commandLink action="{!openViewRulePage}" value="{!rule.followMeFieldDisplay}" rendered="{!NOT(rule.ismemberlookup)}">
+                           <apex:param name="matchingRuleId" value="{!rule.matchingRule.id}"/>
+                   	</apex:commandLink>
+                   	<apex:outputText rendered="{!rule.ismemberlookup}" value="n/a"/>
+              	</apex:column>
+           	</apex:pageBlockTable>
+       	</apex:pageblock>
+
+        <apex:pageblock title="Member Points Scoring Rules" id="member_points_calculation_related_list" rendered="{!EditIsNotActive && (ShowMembersOnly == false)}">
+        		<apex:pageBlockButtons location="top" >
+           			<apex:commandButton value="New" action="{!createNewMemberPointsCalculationRules}" rendered="{!pointsCalculationCreateIsAllowed}"/>
+           		</apex:pageBlockButtons>
+           		<apex:pageBlockTable value="{!memberPointsCalculationRulesList}" var="item">
+           			<apex:column rendered="{!OR(pointsCalculationEditIsAllowed,pointsCalculationDeleteIsAllowed)}">
+		         		<apex:facet name="header" >Action</apex:facet>
+		            	<apex:commandLink value="Edit" action="{!openMemberPointsCalculationEditRulePage}" rendered="{!pointsCalculationEditIsAllowed}">
+		           			<apex:param name="ruleId" value="{!item.rule.id}"/>
+		              	</apex:commandLink> &nbsp; | &nbsp;
+		              	<apex:commandLink value="Del" rendered="{!pointsCalculationDeleteIsAllowed}" action="{!deleteMemberPointsCalculationRule}"  onclick="if (!window.confirm('Are you sure?')) return false;" rerender="member_points_calculation_related_list">
+		           			<apex:param name="ruleId" value="{!item.rule.id}"/> 
+		          		</apex:commandLink>&nbsp; &nbsp;
+              		</apex:column>
+              		<apex:column headerValue="IF">
+						<apex:commandLink action="{!openViewMemberPointsCalculationPage}" value="{!item.ifContidion}">
+	                           <apex:param name="ruleId" value="{!item.rule.id}"/>
+	                   	</apex:commandLink>
+                   	</apex:column>
+                   	<apex:column headerValue="Add Points">
+	                   	<apex:commandLink action="{!openViewMemberPointsCalculationPage}" value="{!item.addPoints}">
+	                           <apex:param name="ruleId" value="{!item.rule.id}"/>
+	                   	</apex:commandLink>
+	                </apex:column>
+              		<apex:column headerValue="Action On Error">
+	                   	<apex:commandLink action="{!openViewMemberPointsCalculationPage}" value="{!item.actionOnError}">
+	                           <apex:param name="ruleId" value="{!item.rule.id}"/>
+	                   	</apex:commandLink>
+	                </apex:column>
+	              </apex:pageBlockTable>
+        </apex:pageblock>
+        
+        <apex:pageblock title="Actions" id="ag_action" rendered="{!EditIsNotActive && (ShowMembersOnly == false)}">
+        		<apex:pageBlockButtons location="top" >
+           			<apex:commandButton value="New" action="{!NewAction}" rendered="{!actionsCreateIsAllowed}"/>
+           		</apex:pageBlockButtons>
+           		
+           		<apex:pageBlockTable value="{!ActionsList}" var="item">
+          			<apex:column rendered="{!OR(actionsEditIsAllowed,actionsDeleteIsAllowed)}">
+		         		<apex:facet name="header" >Action</apex:facet>
+		            	<apex:commandLink value="Edit" action="{!openActionEditPage}">
+		           			<apex:param name="ruleId" value="{!item.actionobj.id}"/>
+		              	</apex:commandLink> &nbsp; | &nbsp;
+		              	<apex:commandLink value="Del" action="{!deleteAction}">
+		           			<apex:param name="ruleId" value="{!item.actionobj.id}"/> 
+		          		</apex:commandLink>&nbsp; &nbsp;
+              		</apex:column>
+          			<apex:column headerValue="Rule Id">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.actionobj.ortoo_qra__Processing_Order__c}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Action Type">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.actionobj.ortoo_qra__Action_Type__c}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Trigger On">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.actionobj.ortoo_qra__Trigger_On__c}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Trigger Type">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.actionobj.ortoo_qra__Trigger_Type__c}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Match Field">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.actionobj.ortoo_qra__Match_Field__c}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Match Pattern">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.actionobj.ortoo_qra__Match_Pattern__c}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Action Rule">
+		  				<apex:commandLink action="{!openViewActionsPage}" value="{!item.ActionRuleString}">
+	                           <apex:param name="ruleId" value="{!item.actionobj.id}"/>
+	                   	</apex:commandLink>	
+		  			</apex:column>
+		  			<apex:column headervalue="Overwrite non-blank Value">
+		  				<apex:outputPanel rendered="{!item.actionobj.ortoo_qra__Action_Type__c == 'Update Field'}">
+			  				<apex:image value="/img/checkbox_checked.gif" rendered="{!item.actionobj.ortoo_qra__Overwrite_non_blank_Values__c}"/>
+			  				<apex:image value="/img/checkbox_unchecked.gif" rendered="{!NOT(item.actionobj.ortoo_qra__Overwrite_non_blank_Values__c)}"/>
+		  				</apex:outputPanel>
+		  				<apex:outputText Value="-" rendered="{!item.actionobj.ortoo_qra__Action_Type__c == 'Run Visual Flow'}"/>
+		  			</apex:column>
+		  			<apex:column headervalue="Stop Processing Further Rules">
+		  				<apex:outputPanel rendered="{!item.actionobj.ortoo_qra__Action_Type__c == 'Update Field'}">
+			  				<apex:image value="/img/checkbox_checked.gif" rendered="{!item.actionobj.ortoo_qra__Stop_Processing_Further_Rules__c}"/>
+			  				<apex:image value="/img/checkbox_unchecked.gif" rendered="{!NOT(item.actionobj.ortoo_qra__Stop_Processing_Further_Rules__c)}"/>
+		  				</apex:outputPanel>
+		  				<apex:outputText Value="-" rendered="{!item.actionobj.ortoo_qra__Action_Type__c == 'Run Visual Flow'}"/>
+		  			</apex:column>
+	              </apex:pageBlockTable>
+        </apex:pageblock>
+        <apex:pageBlock title="Assignment Group Detail" id="pageEdit" rendered="{!EditIsActive}" mode="edit">
+            <apex:pageMessages />
+           <apex:pageBlockButtons >
+                <apex:commandButton status="sectionSaveStatus" reRender="membersList,group_member_list_table,pageEdit" action="{!SaveAssignmentGroup}" value="Save"/>
+                <apex:commandButton status="sectionSaveStatus" action="{!CancelEditAssignmentGroup}" value="Cancel" immediate="true"/>
+                 <apex:actionStatus id="sectionSaveStatus">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection columns="2" collapsible="false" title="Assignment Group Details">
+            	<apex:pageBlockSectionItem helpText="{!GroupName_HelpText}">
+                    <c:customHelpTextLabel labelValue="Group Name" labelFor="Group_Name_Input" helpTextID="GroupNameInput" helpText="{!GroupName_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:inputText value="{!ortoo_qra__Assignment_Group__c.Name}" style="width:300px;"/>
+                        <apex:image value="{!$Resource.ortoo_qra__red_asterisk}"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem helpText="{!GroupDescription_HelpText}">
+                    <c:customHelpTextLabel labelValue="Description" helpTextID="Description1" helpText="{!GroupDescription_HelpText}"/>
+                    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Description__c}" style="width:250px;"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem helpText="{!ObjectName_HelpText}">
+                    <c:customHelpTextLabel labelValue="Object" helpTextID="Object1" helpText="{!ObjectName_HelpText}"/>
+                   <apex:PanelGrid columns="7" id="target_object">
+	                    <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Object_Prefix__c}" id="owner_type_add" size="1" onchange="JSOnchangefunction();">
+	                        <apex:selectOptions value="{!ObjectOptions}"></apex:selectOptions>
+	                    </apex:selectList>
+	                    <apex:actionfunction name="ObjectChanged" action="{!ObjectChanged}" rerender="target_object,queue_panel,source_label,queue_id_edit,status_field_section,so_field,status_list_section,sc_table,ac_table, mf_list, follow_me_table, qsc_fl, arc_fl, load_points_field, object_owner_field" status="sectionRuleActStatus" oncomplete="validateCustomObject();"/>
+	                    <apex:actionfunction name="rerenderfunc" rerender="owner_type_add,custom_object"/>	                  
+	                    <apex:actionStatus id="sectionRuleActStatus">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+			             <apex:actionfunction name="CustomObjectChanged" action="{!ObjectChanged}" rerender="queue_panel,source_label,queue_id_edit,status_field_section,so_field,status_list_section,sc_table,ac_table, mf_list, follow_me_table, qsc_fl, arc_fl" status="customObjectChange" oncomplete="validateCustomObject();"/>
+			             <apex:selectList value="{!customObjectPrefix}" id="custom_object" size="1" rendered="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Object_Prefix__c=='1',true,false)}" onchange="customObjectJSOnchangefunction();">
+	                        <apex:selectOptions value="{!CustomObjectOptions}"></apex:selectOptions>
+	                     </apex:selectList>
+	                    <apex:actionStatus id="customObjectChange">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+			            <apex:actionfunction name="validateCustomObject" action="{!validateCustomObject}" rerender="pageEdit" />
+                    </apex:PanelGrid>   
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem />
+                <apex:pageBlockSectionItem helpText="{!ProcessingOrder_HelpText}">
+                    <c:customHelpTextLabel labelValue="Processing Order" helpTextID="Processing_Order" helpText="{!ProcessingOrder_HelpText}"/>
+                    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Processing_Order__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!LoggedInUser_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assign To Logged In Users Only" helpTextID="Assign_Logged_Users" helpText="{!LoggedInUser_HelpText}"/>
+                       <apex:inputCheckbox value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_To_Logged_In_Users__c}" >
+                       		<apex:actionsupport event="onchange" rerender="pageEdit"/>
+                       </apex:inputCheckbox>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ProcessingType_HelpText}">
+                    <c:customHelpTextLabel labelValue="Processing Type" helpTextID="Processing_Type1" helpText="{!ProcessingType_HelpText}"/>
+                       <apex:outputPanel >
+                       		<apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Processing_Type__c}" id="rejected_email_queue" size="1">
+								<apex:selectOptions value="{!ProcessingTypeOptions}"></apex:selectOptions>
+								<apex:actionSupport event="onchange" rerender="pull_button" status="processingTypeRefresh"/>
+							</apex:selectList>
+							<apex:actionStatus id="processingTypeRefresh">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+						</apex:outputPanel> 
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem rendered="{!NOT(ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_To_Logged_In_Users__c)}"/>
+                <apex:pageBlockSectionItem helpText="{!ActivityTimeout_HelpText}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_To_Logged_In_Users__c}">
+	            	<c:customHelpTextLabel labelValue="Activity Timeout (in minutes)" helpTextID="Activity_Timeout" helpText="{!ActivityTimeout_HelpText}"/>
+	            	<apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Activity_Timeout__c}" style="margin-left: 3px;"/>
+				</apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!PullButton_HelpText}">
+                    <c:customHelpTextLabel labelValue="Show Pull button to members" helpTextID="Show_Pull_button_members" helpText="{!PullButton_HelpText}"/>
+                       <apex:inputCheckbox value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Show_Pull_Button__c}" id="pull_button" disabled="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Processing_Type__c=='Push',true,false)}" >
+                        </apex:inputCheckbox>
+                 </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!UserShiftHoursOnly_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assign to users in their Working/Shift Hours only" helpTextID="Shift1" helpText="{!UserShiftHoursOnly_HelpText}"/>
+                       <apex:inputCheckbox value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assign_Users_in_Working_Shift_Hours_Only__c}" >
+                       		<apex:actionsupport event="onchange" rerender="pageEdit"/>
+                       </apex:inputCheckbox>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!WorkingHoursSchedule_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assignment Hours Schedule" helpTextID="Assignment_Hours_Schedule" helpText="{!WorkingHoursSchedule_HelpText}"/>
+                    <apex:PanelGrid columns="5" >
+	                    <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Business_Hours_Schedule__c}" id="business_hours" size="1">
+	                        <apex:selectOptions value="{!businessHoursOptions}"></apex:selectOptions>
+	                        <apex:actionSupport event="onchange" reRender="active_flags,outsideworkinghours" status="businessHoursRefresh"/>
+	                    </apex:selectList>
+	                    <apex:commandLink rerender="business_hours" status="businessHoursRefresh">
+                		<apex:image value="{!$Resource.ortoo_qra__Refresh}" height="15px" width="15px" title="Refresh Assignment Hours Schedule List"/>
+                		</apex:commandLink>
+                		&nbsp;&nbsp;
+                		<apex:commandLink onclick="window.open('/01m/e');return false;" value="Create new Assignment Hours Schedule" />
+	                    <apex:actionStatus id="businessHoursRefresh">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+                    </apex:PanelGrid>   
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!IsEnabled_HelpText}">
+                    <c:customHelpTextLabel labelValue="Enabled" helpTextID="Enabled" helpText="{!IsEnabled_HelpText}"/>
+                    <apex:outputPanel >
+                        <apex:actionRegion >
+                            <apex:inputCheckbox value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Is_Active__c}">
+                                <apex:actionSupport event="onchange" reRender="active_flags" status="activeFlagsActStatus"/>
+                            </apex:inputCheckbox>
+                        </apex:actionRegion>
+                        <apex:actionStatus id="activeFlagsActStatus">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageblocksectionItem helpText="{!ActiveOutsideWorkingHours_HelpText}">
+                	<c:customHelpTextLabel labelValue="Active Only Outside Working Hours" helpTextID="Active_Outside_Working_Hours" helpText="{!ActiveOutsideWorkingHours_HelpText}"/>
+                    <apex:outputPanel id="outsideworkinghours">
+                    	<apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Active_Only_Outside_Working_Hours__c}"  rendered="{!IF(ISNULL(ortoo_qra__Assignment_Group__c.ortoo_qra__Business_Hours_Schedule__c),false,true)}">
+                    		<apex:actionSupport event="onchange" reRender="active_flags" status="outsideHoursRefresh"/>
+                    	</apex:inputField>
+                    	<apex:image value="/img/checkbox_unchecked.gif" rendered="{!IF(ISNULL(ortoo_qra__Assignment_Group__c.ortoo_qra__Business_Hours_Schedule__c),true,false)}"/>
+                    	<apex:actionStatus id="outsideHoursRefresh">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageblocksectionItem>
+                <apex:pageBlockSectionItem helpText="{!IsActive_HelpText}">
+               		<c:customHelpTextLabel labelValue="Active" helpTextID="Active" helpText="{!IsActive_HelpText}"/>
+					<apex:outputPanel id="active_flags" >
+					&nbsp;
+                	<apex:image value="{!$Resource.ortoo_qra__green_spot}" title="Assignment group is active" rendered="{!assignmentGroupIsActive == true}"/>
+                	<apex:image value="{!$Resource.ortoo_qra__red_spot}" title="Assignment group is inactive" rendered="{!assignmentGroupIsActive == false}"/>
+                       </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ObjectOwnerField_HelpText}">
+                    <c:customHelpTextLabel labelValue="Object Owner Field" helpTextID="Object_Owner_Field1" helpText="{!ObjectOwnerField_HelpText}"/>
+                    <apex:outputPanel id="object_owner_field">
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Object_Owner_Field__c}" size="1">
+                            <apex:selectOptions value="{!objectOwnerFieldOptions}"></apex:selectOptions>
+                        </apex:selectList>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:outputPanel id="field_selection_popup">
+			<apex:outputPanel styleClass="fieldSelectionPopupBackground" layout="block" rendered="{!fieldSelectionDisplayPopup}"/>
+				
+				<apex:outputPanel styleClass="fieldSelectionPopup" layout="block" rendered="{!fieldSelectionDisplayPopup}">
+					<div class="inner_container">
+						<table>
+							<tr>
+								<td>
+									<b><c:customHelpTextLabel labelValue="Select {!ObjectName} Field" helpTextID="Select_Field1" helpText="{!ObjectName_HelpText}"/>
+									</b>
+									<br/>
+									<br/>
+									<apex:selectList value="{!fieldApiName}" size="12">
+										<apex:selectOptions value="{!ObjectFieldOptionswithLookup}">
+										</apex:selectOptions>
+										<apex:actionSupport event="onchange" action="{!onChangeOfFieldAPIName}" reRender="lookup_field_block" status="showlookup"/>
+									</apex:selectList>
+								</td>
+								<td>
+								   <apex:outputPanel id="lookup_field_block" >
+									   	<b><c:customHelpTextLabel rendered="{!isLookupFieldSelected == true}" labelValue="{!relatedFieldPicklistHeading}" helpTextID="relatedFieldPicklistHeading" helpText="{!ObjectName_HelpText}"/>
+										</b>
+										<br/>
+										<br/>
+										<apex:selectList value="{!referenceFieldApiName}" size="12" rendered="{!isLookupFieldSelected == true}">
+											<apex:selectOptions value="{!referenceToFieldOptions}">
+											</apex:selectOptions>
+										</apex:selectList>
+									</apex:outputPanel>
+								</td>
+								<td>
+									<apex:actionStatus id="showlookup">
+										<apex:facet name="start">
+											<div class="fieldSelectionLoader">
+												<img src="/img/loading.gif"/>
+											</div>
+										</apex:facet>
+									</apex:actionStatus>
+								</td>
+							</tr>
+							<tr/>
+							<tr>
+								<td colspan="3">
+									<div style="float:right;display:block;margin-right:0px;clear:left;">
+										<apex:commandButton value="Select" action="{!closefieldSelectionPopup}" rerender="pageEdit" oncomplete="loadMultiPicklistForSelectionCriteria();loadMultiPicklistForActiveCriteria();" status="button_action"/>
+										&nbsp;
+										<apex:commandButton value="Cancel" action="{!cancelfieldSelectionPopup}" rerender="pageEdit" oncomplete="loadMultiPicklistForSelectionCriteria();loadMultiPicklistForActiveCriteria();" status="button_action"/>
+										&nbsp;
+										<apex:actionStatus id="button_action">
+										<apex:facet name="start">
+											<img src="/img/loading.gif"/>
+										</apex:facet>
+									</apex:actionStatus>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div><!-- Inner Container -->  
+				</apex:outputPanel>
+			</apex:outputPanel>
+            <apex:pageBlockSection columns="1" collapsible="false" title="{!ObjectLabel} Selection Rules" id="queue_selection_rules">
+            	<apex:pageBlockSectionItem helpText="{!QueueName_HelpText}">
+                    <c:customHelpTextLabel labelValue="Source {!sourceName}" helpTextID="Source1" helpText="{!QueueName_HelpText}"/>
+                    <apex:outputPanel id="queue_panel">
+                    	<apex:PanelGrid columns="4" id="assigned_owner_panel">
+	                    	<apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Type__c}" size="1" id="ownerType">
+	    							<apex:selectOptions value="{!queueTypeOptions}"></apex:selectOptions>
+	    							<apex:actionSupport event="onchange" reRender="queue_panel" status="queueLoading"/>
+	    						</apex:selectList>
+	    				    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__User_Id__c}" rendered="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Type__c=='USER',true,false)}"/>
+	                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Id__c}" size="1" id="queue_id_edit" rendered="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Queue_Type__c=='QUEUE',true,false)}">
+	                            <apex:selectOptions value="{!ObjectQueueOptions}"></apex:selectOptions>
+	                        </apex:selectList>
+	                        <!-- <apex:image value="{!$Resource.ortoo_qra__red_asterisk}"/>-->
+	                        <apex:actionStatus id="queueLoading">
+	                        	<apex:facet name="start">
+	                        		<img src="/img/loading.gif" />
+	                        	</apex:facet>
+	                        </apex:actionStatus>
+                        </apex:PanelGrid>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <script>
+                	function loadMultiPicklistForSelectionCriteria()
+                	{
+                		j$('.qsclist').multiselect();
+                	}
+                </script>
+                <apex:pageBlockSectionItem helpText="{!SelectionCriteria_HelpText}">
+                    <c:customHelpTextLabel labelValue="Selection Criteria" helpTextID="Selection_Criteria" helpText="{!SelectionCriteria_HelpText}"/>
+                    <apex:outputPanel id="sc_table">
+                    	<apex:variable var="rowNumber" value="{!0}"/>
+                        <apex:pageBlockTable value="{!selectionCriteriaListInput}" var="SCItem">
+                            <apex:column >
+                                <apex:outputText value="{!SCItem.Order}"/>
+                            </apex:column>
+                            <apex:column headerValue="Field">
+                               <apex:inputText value="{!SCItem.FieldLabel}" html-readonly="true">
+		                            <apex:actionSupport event="onclick" status="QSCnamestatus" reRender="pageEdit" action="{!fieldSelectionShowPopup}">
+		                                 <apex:param name="index" value="{!rowNumber}"/>
+		                                  <apex:param name="isARC" value="0"/>
+		                            </apex:actionSupport>
+                       		 </apex:inputText>
+                                <apex:actionStatus id="QSCnamestatus">
+							    <apex:facet name="start">
+							      <img src="/img/loading.gif" />                  
+							    </apex:facet>
+							</apex:actionStatus>
+                            </apex:column>
+                            <apex:column headerValue="Operator">
+                                <apex:selectList value="{!SCItem.crit.ortoo_qra__Operator__c}" size="1">
+                                    <apex:selectOptions value="{!SelectionCriteriaOperatorOptions}"></apex:selectOptions>
+                                </apex:selectList>
+                            </apex:column>
+                            <apex:column headerValue="Value"> 
+                               <apex:inputText value="{!SCItem.crit.ortoo_qra__Field_Value__c}" rendered="{!AND(SCItem.ShowOptionsList == false,SCItem.fieldCheckbox == false,SCItem.fieldDateTime == false,SCItem.isLookupField == false)}"/>
+                               <apex:selectList value="{!SCItem.FieldValues}" size="2" styleClass="qsclist" multiselect="true" rendered="{!SCItem.ShowOptionsList}" >
+                                   <apex:selectOptions value="{!SCItem.ShowOptions}"></apex:selectOptions>
+                               </apex:selectList> 
+                              
+                             
+                               <apex:inputCheckbox value="{!SCItem.crit.ortoo_qra__Field_Value__c}" rendered="{!SCItem.fieldCheckbox}"/>  
+                               <apex:inputField value="{!fieldQSCDate.ActivityDate}" rendered="{!SCItem.fieldDateTime}" />
+                               <apex:inputHidden value="{!SCItem.crit.ortoo_qra__Field_Value__c}" id="targetId" rendered="{!SCItem.isLookupField}"/>
+                               <apex:selectList value="{!SCItem.assignedOwnerType}" size="1" rendered="{!AND(SCItem.isLookupField,SCItem.isOwnerLookupField)}">
+                                	<apex:selectOptions value="{!SCItem.AssignedOwnerTypeOptions}"></apex:selectOptions>
+                                    <apex:actionSupport event="onchange" reRender="sc_table" action="{!reSetOwnerType}" oncomplete="loadMultiPicklistForSelectionCriteria();" status="owner_type_staus">
+                                		<apex:param name="owner_type_index" value="{!rowNumber}"/>
+                                	</apex:actionSupport>
+                                </apex:selectList>
+                               <apex:inputText value="{!SCItem.lookupNameField}" id="targetName" onFocus="this.blur()" disabled="false" rendered="{!SCItem.isLookupField}"/>
+                               <apex:outputLink title="Related To Lookup (New Window)"  rendered="{!SCItem.isLookupField}" style="vertical-align:top" onclick="openLookupPopup('{!$Component.targetName}', '{!$Component.targetId}', '{!SCItem.lookupFieldObjectPrefix}','{!JSENCODE(SCItem.assignedOwnerType)}','{!JSENCODE(SCItem.objectName)}'); return false">
+                              	 <img src="/s.gif" class="lookupIcon" onmouseout="this.className='lookupIcon';" onmouseover="this.className='lookupIconOn';"/>
+                               </apex:outputLink>
+                                <apex:actionStatus id="owner_type_staus">
+                                	<apex:facet name="start">
+                                        <img src= "/img/loading.gif"/>
+                                    </apex:facet>
+                                    <apex:facet name="stop">
+                                    </apex:facet>
+                                </apex:actionStatus>     	
+                           </apex:column>
+                           <apex:column headerValue="Action">
+                                <apex:commandLink value="Remove" action="{!deleteSelectionCriteria}" reRender="sc_table" status="removeSelectionCriteria" oncomplete="loadMultiPicklistForSelectionCriteria();">
+                                    <apex:param name="delIndex" value="{!rowNumber}"/>
+                                </apex:commandLink>
+                                &nbsp;&nbsp;
+                                 <apex:variable var="rowNumber" value="{!rowNumber+1}"/>
+                                <apex:actionStatus id="removeSelectionCriteria">
+                                	<apex:facet name="start">
+                                        <img src= "/img/loading.gif"/>
+                                    </apex:facet>
+                                    <apex:facet name="stop">
+                                    </apex:facet>
+                                </apex:actionStatus>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                   		<apex:commandLink value="Add Row" reRender="sc_table" action="{!addQueueSelectionCriteria}" status="addQueueSelectionRule" oncomplete="loadMultiPicklistForSelectionCriteria();"/>
+	                        <apex:actionStatus id="addQueueSelectionRule">
+	                        	<apex:facet name="start">
+	                                <img src= "/img/loading.gif"/>
+	                         </apex:facet>
+					    </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>                
+                <apex:pageBlockSectionItem helpText="{!QSCFilterLogic_HelpText}"  >
+                 <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Selection Criteria Filter Logic" helpTextID="Selection_Criteria_Filter_Logic" helpText="{!QSCFilterLogic_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__QSC_Filter_Logic__c}" id="qsc_fl"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentMethodBasis_HelpText}">
+                    <c:customHelpTextLabel labelValue="Selection Order Field 1" helpTextID="Selection_Order_Field11" helpText="{!AssignmentMethodBasis_HelpText}"/>
+                    <apex:PanelGrid columns="4">
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis__c}" size="1" id="so_field">
+                            <apex:selectOptions value="{!AssignmentMethodBasisOptions}"></apex:selectOptions>
+                        </apex:selectList>
+                        &nbsp;&nbsp;
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method__c}" size="1">
+                        	<apex:selectOptions value="{!AssignmentMethodOptions}"></apex:selectOptions>
+                    	</apex:selectList>
+                    	<apex:actionStatus id="selection_order_field1">
+                        	<apex:facet name="start">
+                                <img src="/img/loading.gif"/>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:PanelGrid>
+                </apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem helpText="{!AssignmentMethodBasis_HelpText}">
+                    <c:customHelpTextLabel labelValue="Selection Order Field 2" helpTextID="Selection_Order_Field21" helpText="{!AssignmentMethodBasis_HelpText}"/>
+                    <apex:PanelGrid columns="4">
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis2__c}" size="1" id="so_field">
+                            <apex:selectOptions value="{!AssignmentMethodBasis2Options}"></apex:selectOptions>
+                            <apex:actionSupport event="onchange" reRender="queue_selection_rules" status="selection_order_field2"/>
+                        </apex:selectList>
+                        &nbsp;&nbsp;
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method2__c}" size="1" disabled="{!ISNULL(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis2__c)}">
+                        	<apex:selectOptions value="{!AssignmentMethod2Options}"></apex:selectOptions>
+                    	</apex:selectList>
+                    	 <apex:actionStatus id="selection_order_field2">
+                        	<apex:facet name="start">
+                                <img src="/img/loading.gif"/>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:PanelGrid>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentMethodBasis_HelpText}">
+                    <c:customHelpTextLabel labelValue="Selection Order Field 3" helpTextID="Selection_Order_Field31" helpText="{!AssignmentMethodBasis_HelpText}"/>
+                    <apex:PanelGrid columns="4">
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis3__c}" size="1" id="so_field">
+                            <apex:selectOptions value="{!AssignmentMethodBasis2Options}"></apex:selectOptions>
+                             <apex:actionSupport event="onchange" reRender="queue_selection_rules" status="selection_order_field3"/>
+                        </apex:selectList>
+                         &nbsp;&nbsp;
+                        <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method3__c}" size="1" disabled="{!ISNULL(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Method_Basis3__c)}">
+                        	<apex:selectOptions value="{!AssignmentMethod3Options}"></apex:selectOptions>
+                    	</apex:selectList>
+                    	<apex:actionStatus id="selection_order_field3">
+                        	<apex:facet name="start">
+                                <img src="/img/loading.gif"/>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:PanelGrid>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="false" title="Assignment Rules" id="Assignment_Rule">
+            	<apex:pageBlockSectionItem helpText="{!AssignmentMode_HelpText}">
+                    <c:customHelpTextLabel labelValue="Assignment Mode" helpTextID="Assignment_Mode1" helpText="{!AssignmentMode_HelpText}"/>
+                    <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c}" size="1">
+                        <apex:selectOptions value="{!AssignmentModeOptions}"></apex:selectOptions>
+                        <apex:actionSupport event="onchange" rerender="Assignment_Rule"/>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MinimumScore_HelpText}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c == 'Points Based - Highest Points'}">
+                    <c:customHelpTextLabel labelValue="Minimum Score Threshold" helpTextID="Minimum_Score_Threshold" helpText="{!MinimumScore_HelpText}"/>
+                    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Point_Score_Threshold__c}" onblur="if(this.value == '') this.value = 'no minimum';"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!MaximumScore_HelpText}" rendered="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c == 'Points Based - Lowest Points'}">
+                    <c:customHelpTextLabel labelValue="Maximum Score Threshold" helpTextID="Maximum_Score_Threshold" helpText="{!MaximumScore_HelpText}"/>
+                    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Point_Score_Threshold__c}" onblur="if(this.value == '') this.value = 'no maximum';"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentQuota_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Assignment Quota" helpTextID="Assignment_Quota" helpText="{!AssignmentQuota_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c}" style="width:60px;"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!QuotaPeriod_HelpText}">
+                    <c:customHelpTextLabel labelValue="Quota Period" helpTextID="Quota_Period" helpText="{!QuotaPeriod_HelpText}"/>
+                    <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Round_Robin_Quota_Period__c}" id="quota_period" size="1">
+                        <apex:selectOptions value="{!RoundRobinQuotaPeriodOptions}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!GlobalAssignmentQuota_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Global Assignment Quota" helpTextID="Global_Assignment_Quota" helpText="{!GlobalAssignmentQuota_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c}" style="width:60px;"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!GlobalAssignmentQuotaPeriod_HelpText}">
+                    <c:customHelpTextLabel labelValue="Global Assignment Quota Period" helpTextID="Global_Assignment_Quota_Period" helpText="{!GlobalAssignmentQuotaPeriod_HelpText}"/>
+                    <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota_Period__c}" id="quota_period" size="1">
+                        <apex:selectOptions value="{!GlobalAssignmentQuotaPeriodOptions}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!AssignmentsLevel_HelpText}">
+                    <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Max Assignment Cap" helpTextID="Max_Assignment_Cap" helpText="{!AssignmentsLevel_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c}" style="width:60px;"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!LoadPointsField_HelpText}">
+                    <c:customHelpTextLabel labelValue="Load Points Field" helpTextID="Load_Points_Field" helpText="{!LoadPointsField_HelpText}"/>
+                    <apex:outputPanel id="load_points_field">
+                    	<apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Load_Points_Field__c}" size="1">
+                        	<apex:selectOptions value="{!loadPointsFieldOptions}"></apex:selectOptions>
+                         	<apex:actionSupport event="onchange" rerender="Assignment_Rule" action="{!setMaxAssignmentPointsCap}" status="Max_Assignment_Points_Cap_Status" oncomplete="loadMultiPicklistForActiveCriteria();">
+                         	</apex:actionSupport>
+                    	</apex:selectList>
+                    	 <apex:actionStatus id="Max_Assignment_Points_Cap_Status">
+						    <apex:facet name="start">
+						      <img src="/img/loading.gif" />                  
+						    </apex:facet>
+						</apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!MaxAssignmentPointsCap_HelpText}" rendered="{!IF(showMaxAssignmentPointsCap == true,true,false)}">
+	                    <c:customHelpTextLabel labelValue="Max Load Points Cap" helpTextID="x_Assignment_Points_Cap_Label" helpText="{!MaxAssignmentPointsCap_HelpText}"/>
+	                     <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c}" style="width:60px;" id="Max_Assignment_Points_Cap_Field" />
+	             </apex:pageBlockSectionItem>
+               
+                <script>
+                	function loadMultiPicklistForActiveCriteria()
+                    {
+                	   j$('.arclist').multiselect();
+                    }
+                </script>
+                <apex:pageBlockSectionItem helpText="{!ActiveCriteria_HelpText}">
+                    <c:customHelpTextLabel labelValue="Active Record Criteria" helpTextID="Active_Record_Criteria" helpText="{!ActiveCriteria_HelpText}"/>
+                    <apex:outputPanel id="ac_table">
+                   		 <apex:variable var="activeRow" value="{!0}"/>
+                        <apex:pageBlockTable value="{!ActiveCriteriaListInput}" var="ACItem">
+                            <apex:column >
+                                <apex:outputText value="{!ACItem.Order}"/>
+                            </apex:column>
+                            <apex:column headerValue="Field">
+                            	<apex:inputText value="{!ACItem.FieldLabel}" html-readonly="true">
+		                            <apex:actionSupport event="onclick" status="ARCnamestatus" reRender="pageEdit" action="{!fieldSelectionShowPopup}">
+		                                 <apex:param name="index" value="{!activeRow}"/>
+		                                  <apex:param name="isARC" value="1"/>
+		                            </apex:actionSupport>
+                       		 	</apex:inputText>
+                                <apex:actionStatus id="ARCnamestatus">
+							    <apex:facet name="start">
+							      <img src="/img/loading.gif" />                  
+							    </apex:facet>
+								</apex:actionStatus>
+                                <!-- <apex:selectList value="{!ACItem.crit.Field_Name__c}" size="1">
+                                    <apex:selectOptions value="{!SelectionCriteriaFieldOptions}"></apex:selectOptions>
+                                    <apex:actionSupport event="onchange" rerender="ac_table" oncomplete="loadMultiPicklistForActiveCriteria();" action="{!setfieldChangeARC}" status="ARCnamestatus">
+                                    	<apex:param name="paramValue" value="{!ACItem.Order}"></apex:param>
+                                    	</apex:actionSupport>
+                                </apex:selectList>
+                                <apex:actionStatus id="ARCnamestatus">
+							    <apex:facet name="start">
+							      <img src="/img/loading.gif" />                  
+							    </apex:facet>
+							</apex:actionStatus>-->
+                            </apex:column>
+                            <apex:column headerValue="Operator">
+                                <apex:selectList value="{!ACItem.crit.ortoo_qra__Operator__c}" size="1">
+                                    <apex:selectOptions value="{!ActiveCriteriaOperatorOptions}"></apex:selectOptions>
+                                </apex:selectList>
+                            </apex:column>
+                            <apex:column headerValue="Value"> 
+                               <apex:inputText value="{!ACItem.crit.ortoo_qra__Field_Value__c}" rendered="{!AND(ACItem.ShowOptionsList == false,ACItem.fieldCheckbox == false,ACItem.fieldDateTime == false,ACItem.isLookupField==false)}"/>
+                               <apex:selectList value="{!ACItem.FieldValues}" styleclass="arclist" size="2" multiselect="true" rendered="{!ACItem.ShowOptionsList}">
+                                   <apex:selectOptions value="{!ACItem.ShowOptions}"></apex:selectOptions>
+                               </apex:selectList> 
+                               <apex:inputCheckbox value="{!ACItem.crit.ortoo_qra__Field_Value__c}" rendered="{!ACItem.fieldCheckbox}"/>  
+                               <apex:inputField value="{!fieldARCDate.ActivityDate}" rendered="{!ACItem.fieldDateTime}"/>
+                               <apex:inputText value="{!ACItem.crit.ortoo_qra__Field_Value__c}" id="targetId_ac" rendered="{!AND(ACItem.isLookupField)}" style="display:none;"/>
+                               <apex:selectList value="{!ACItem.assignedOwnerType}" size="1" rendered="{!AND(ACItem.isLookupField,ACItem.isOwnerLookupField)}" id="owner_type_ac">
+                                	<apex:selectOptions value="{!ACItem.AssignedOwnerTypeOptions}"></apex:selectOptions>
+                                    <apex:actionSupport event="onchange" reRender="ac_table" action="{!reSetOwnerTypeForActiveCriteria}" oncomplete="loadMultiPicklistForActiveCriteria();" status="owner_type_staus_ac">
+                                		<apex:param name="owner_type_index_ac" value="{!activeRow}"/>
+                                	</apex:actionSupport>
+                                </apex:selectList> 
+                               <apex:inputText value="{!ACItem.lookupNameField}" id="targetName_ac" onFocus="this.blur()" disabled="false" rendered="{!ACItem.isLookupField}"/>
+                               <apex:outputLink title="Related To Lookup (New Window)"  rendered="{!ACItem.isLookupField}" style="vertical-align:top" onclick="openLookupPopup('{!$Component.targetName_ac}', '{!$Component.targetId_ac}', '{!ACItem.lookupFieldObjectPrefix}','{!JSENCODE(ACItem.assignedOwnerType)}','{!ObjectName}'); return false">
+                              	 <img src="/s.gif" class="lookupIcon" onmouseout="this.className='lookupIcon';" onmouseover="this.className='lookupIconOn';"/>
+                               </apex:outputLink>
+                                <apex:actionStatus id="owner_type_staus_ac">
+                                	<apex:facet name="start">
+                                        <img src= "/img/loading.gif"/>
+                                    </apex:facet>
+                                    <apex:facet name="stop">
+                                    </apex:facet>
+                                </apex:actionStatus>      	
+                           </apex:column>
+                           <apex:column headerValue="Action">
+                                <apex:commandLink value="Remove" action="{!deleteActiveCriteria}" reRender="ac_table" status="removeActiveCriteria" oncomplete="loadMultiPicklistForActiveCriteria();">
+                                    <apex:param name="delActiveCriteriaIndex" value="{!activeRow}"/>
+                                </apex:commandLink>
+                                &nbsp;&nbsp;
+                                 <apex:variable var="activeRow" value="{!activeRow+1}"/>
+                                <apex:actionStatus id="removeActiveCriteria">
+                                	<apex:facet name="start">
+                                        <img src= "/img/loading.gif"/>
+                                    </apex:facet>
+                                    <apex:facet name="stop">
+                                    </apex:facet>
+                                </apex:actionStatus>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                        <apex:commandLink value="Add Row" reRender="ac_table" action="{!addActiveCriteria}" status="addActiveSelectionRule" oncomplete="loadMultiPicklistForActiveCriteria();"/>
+                        <apex:actionStatus id="addActiveSelectionRule">
+                        	<apex:facet name="start">
+                                <img src= "/img/loading.gif"/>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!ARCFilterLogic_HelpText}"  >
+                 <apex:outputPanel >
+                        <c:customHelpTextLabel labelValue="Active Record Criteria Filter Logic" helpTextID="Active_Record_Criteria_Filter_Logic" helpText="{!ARCFilterLogic_HelpText}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel >
+                        <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__ARC_Filter_Logic__c}" id="arc_fl"/>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                 <apex:pageBlockSectionItem helpText="{!ResponseTime_HelpText}">
+                    <c:customHelpTextLabel labelValue="Auto Refresh Member Stats (in seconds)" helpTextID="Auto_Refresh_Member_Stats" helpText="{!ResponseTime_HelpText}"/>
+                    <apex:selectList value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c}" size="1">
+                        <apex:selectOptions value="{!RefreshTimeOptions}"></apex:selectOptions>
+                    </apex:selectList>
+                </apex:pageBlockSectionItem>
+            	<apex:pageBlockSectionItem helpText="{!MatchingRulesFilterLogic_HelpText}">
+                    <c:customHelpTextLabel labelValue="Matching Rules Filter Logic" helpTextID="Matching_Rules_Filter_Logic" helpText="{!MatchingRulesFilterLogic_HelpText}"/>
+                    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Matching_Rule_Filter_Logic__c}"/>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!RunMatchingRulesOnly_HelpText}">
+                    <c:customHelpTextLabel labelValue="Enforce Member Matching Rules" helpTextID="Enforce_Member_Matching_Rules" helpText="{!RunMatchingRulesOnly_HelpText}"/>
+                    <apex:inputField value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Run_Matching_Rules_Only__c}" />
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock title="Add New Assignment Group Members" id="membersAdd" rendered="{!EditIsNotActive && (ShowMembersOnly == false)}">
+            <table>
+            	<tr>
+            	<apex:outputText value="User: "/>
+            	<apex:commandButton value="Add Users" onclick="window.open('/apex/AddUsers?id={!ortoo_qra__Assignment_Group__c.Id}', 'mywindow','height=600,width=950,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');return false;" />
+            	</tr>
+            	<tr>
+            	<td>
+            	&nbsp;
+            	</td>
+            	</tr>
+                <tr>
+                    <td style="width: 1px; white-space: nowrap;">
+                    <apex:outputText value="Queue: "/>
+                        <apex:selectList value="{!NewAssignmentGroupMember.ortoo_qra__Queue__c}" size="1">
+                            <apex:selectOptions value="{!ObjectQueueOptions}"></apex:selectOptions>
+                        </apex:selectList>
+                    </td>
+                        <td>
+                        &nbsp; &nbsp; <apex:commandButton action="{!AddQueue}" value="Add Queue"/>
+                        </td>
+                        <td>
+                        <apex:pageMessages id="error_messages"/>
+                    </td>
+                </tr>
+            </table>
+        </apex:pageBlock>
+        <apex:pageBlock title="Group Members" id="membersList" rendered="{!EditIsNotActive}">
+            <apex:pageBlockButtons >
+	            <apex:commandButton value="Refresh" action="{!RefreshCounts}" reRender="membersList,group_member_list_table" status="actStatus"/>
+                <apex:commandButton value="Show members in new window" onClick="window.open('/apex/AssignmentGroup?id={!ortoo_qra__Assignment_Group__c.Id}&mo');" rendered="{!ShowMembersOnly == false}"/>
+                <apex:outputText value=" (auto-refreshes after every {!ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c} seconds)" rendered="{!ShowMembersOnly}"/>
+		     	<apex:actionStatus id="actStatus"> 
+				    <apex:facet name="start">
+				      <img src="/img/loading.gif" />                      
+				    </apex:facet>
+				</apex:actionStatus>
+				<br/>
+            </apex:pageBlockButtons>
+			<div style="margin-top:10px; margin-left:30%;margin-bottom: 10px;">
+			<apex:outputPanel id="pagination_btn">
+			<apex:outputText style="font-weight:600;margin-right: 5px;" Value="Page Size:" />
+			<apex:actionFunction name="refreshPageSize" action="{!refreshPageSize}" status="fetchStatus" reRender="group_member_list_table,pagination_btn,membersList"/>    
+			<apex:selectList value="{!size}" multiselect="false" size="1"  onchange="refreshPageSize();">
+                    <apex:selectOptions value="{!paginationSizeOptions}"/>
+            </apex:selectList> 
+            <apex:outputText style="font-weight:600;margin-right: 5px;" Value="Page:" />
+	            <apex:commandButton status="fetchStatus" reRender="group_member_list_table,pagination_btn" value="First" action="{!firstRecord}" disabled="{!hasPrevious}" title="First Page"/> 
+                <apex:commandButton status="fetchStatus" reRender="group_member_list_table,pagination_btn" value="Previous" action="{!previous}" disabled="{!hasPrevious}" title="Previous Page"/>  
+                <apex:commandButton status="fetchStatus" reRender="group_member_list_table,pagination_btn" value="Next" action="{!next}" disabled="{!hasNext}" title="Next Page"/> 
+                 <apex:outputPanel >                      
+                    <apex:actionStatus id="fetchStatus" >
+                        <apex:facet name="start" >
+                          <img src="/img/loading.gif" />                    
+                        </apex:facet>
+                    </apex:actionStatus>
+                </apex:outputPanel>
+             </apex:outputPanel> 
+           </div>
+            <!-- Action poller render based on time selected -->
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="10" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 10)}"/>
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="15" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 15)}"/>
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="20" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 20)}"/>
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="30" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 30)}"/>
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="40" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 40)}"/>
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="50" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 50)}"/>
+            <apex:actionPoller action="{!RefreshCounts}" rerender="group_member_list_table" interval="60" rendered="{!AND(ShowMembersOnly , ortoo_qra__Assignment_Group__c.ortoo_qra__Refresh_Time__c == 60)}"/>
+            <apex:commandButton value="Enable" action="{!enableSelected}" onClick="if(!warnNoneSelected('inputId')) return false;" reRender="membersList,group_member_list_table" status="groupMembersActStatus"/>
+            <apex:commandButton value="Disable" action="{!disableSelected}" onClick="if(!warnNoneSelected('inputId')) return false;" reRender="membersList,group_member_list_table" status="groupMembersActStatus"/>
+            <apex:commandButton value="Enable Everywhere" action="{!enableEverywhereSelected}" onClick="if(!warnNoneSelected('inputId')) return false;" reRender="membersList,group_member_list_table" status="groupMembersActStatus"/>
+            <apex:commandButton value="Disable Everywhere" action="{!disableEverywhereSelected}" onClick="if(!warnNoneSelected('inputId')) return false;" reRender="membersList,group_member_list_table" status="groupMembersActStatus"/>
+            <apex:commandButton value="Delete" action="{!deleteSelectedMemberStatus}" onClick="if(warnNoneSelected('inputId')){if(!window.confirm('Are you sure?')) return false;}else{return false;}" reRender="groupMembersStatusOutputPanel,membersList,group_member_list_table" status="groupMembersActStatus"/>
+            <apex:actionStatus id="groupMembersActStatus">
+			    <apex:facet name="start">
+			      <img src="/img/loading.gif" />                  
+			    </apex:facet>
+			</apex:actionStatus>
+            <apex:pageBlockTable value="{!AssignmentGroupMemberList}" columnsWidth="1%" var="SM" id="group_member_list_table">
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:inputCheckbox onclick="selectAllCheckboxes(this, 'inputId')" id="parentCB"/>
+                            <script>clearParentCheckbox('parentCB');</script>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:inputCheckbox value="{!SM.RowSelected}" id="inputId" onclick="updateParentCheckbox(this, 'parentCB')"/> 
+                </apex:column>
+                <apex:column >
+					<apex:facet name="header" >
+                        <apex:outputPanel >
+                            <apex:outputText value="Action" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>This column shows the following three actions:
+
+§ Edit – 'Edit' the per member settings, e.g., Status, Max Cap and Quota etc.
+
+§ Enable/Disable – Toggle the status of a Group Member for this Assignment Group, e.g., Disable a Group Member if you want to stop assignments to that member from this Assignment Group.
+
+§ Make Available/Unavailable – Toggle the status of a Group Member for the whole Q-assign app, e.g., Disable a Group Member if you want to stop assignments to that member from the Q-assign app.
+</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>					
+					<apex:commandLink rerender="group_member_list_table" onclick="window.open('/apex/EditMember?id={!SM.Member.Id}&AG={!ortoo_qra__Assignment_Group__c.Id}', 'mywindow','height=500,width=780,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');return false;">Edit
+                    </apex:commandLink>
+                    <br/>
+                    <apex:commandLink status="Status" action="{!ChangeAssignmentGroupMemberActiveStatus}" rerender="group_member_list_table,group_member_list_msg">
+                        <apex:outputText value="Enable" rendered="{!SM.Member.ortoo_qra__Is_Active__c != true}"/>
+                        <apex:outputText value="Disable" rendered="{!SM.Member.ortoo_qra__Is_Active__c == true}"/>
+                        <apex:param name="editrowmemberid" value="{!SM.Member.Id}" assignTo="{!EditRowAssignmentGroupMemberId}"/>
+                    </apex:commandLink>
+                     
+                    <apex:outputPanel rendered="{!AND(SM.assignmentGroup.ortoo_qra__Assign_To_Logged_In_Users__c, SM.Member.ortoo_qra__Owner_Type__c != 'Queue',SM.SalesforceLoggedIn == 'Yes')}">
+                    <br/>
+                    <apex:commandLink status="Status" action="{!changeQAssignLoginStatus}" rerender="group_member_list_table,group_member_list_msg">
+                        <apex:outputText value="Logout" rendered="{!SM.QAssignLoggedIn == 'Yes'}" title="Logout user from Q-Assign"/>
+                        <apex:outputText value="Login" rendered="{!SM.QAssignLoggedIn == 'No'}" title="Login user to Q-Assign"/>
+                        <apex:param name="editrowmemberid" value="{!SM.Member.Id}" assignTo="{!EditRowAssignmentGroupMemberId}"/>
+                    </apex:commandLink>
+                    </apex:outputPanel>
+                   <br/>
+                   <apex:outputPanel rendered="{!SM.Member.ortoo_qra__Owner_Type__c != 'Queue'}">
+                    <apex:commandLink status="Status" action="{!ChangeAssignmentGroupMemberAvailableStatus}" rerender="group_member_list_table,group_member_list_msg">
+                        <apex:outputText value="Make Available" rendered="{!SM.Member.User__r.ortoo_qra__Assignment_Group_Is_Active__c != true}"/>
+                        <apex:outputText value="Make Unavailable" rendered="{!SM.Member.User__r.ortoo_qra__Assignment_Group_Is_Active__c == true}"/>
+                        <apex:param name="editrowmemberid" value="{!SM.Member.ortoo_qra__User__c}" assignTo="{!EditRowAssignmentGroupUserId}"/> 
+                        <apex:param name="editrowuserid" value="{!SM.Member.User__r.ortoo_qra__Assignment_Group_Is_Active__c}" assignTo="{!EditRowAssignmentGroupMemberAvailablility}"/>
+                    </apex:commandLink>
+                    </apex:outputPanel>
+						<apex:actionStatus id="Status">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+						</apex:actionStatus>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header" >
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Member" action="{!DoSortByName}" rerender="group_member_list_table"/>
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Shows the names of a Group Members (Users) with a circle/dot. The circle/dot displays the user's status by showing green or red color. Green color represents the user's availability for assignments and red color represents that the user is not available for assignments in Q-assign. Members can be sorted in ascending or descending order by clicking on this column.</span>
+							</span>
+                            <apex:outputText rendered="{!SortByName == true && CurrentActiveSort == 4}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByName == false && CurrentActiveSort == 4}">&darr;</apex:outputText>
+                        </apex:outputPanel>
+					</apex:facet>
+                    
+                    <apex:image value="{!$Resource.ortoo_qra__green_spot}" rendered="{!SM.Status == 'ACTIVE'}"/>
+                    <apex:image value="{!$Resource.ortoo_qra__red_spot}" rendered="{!SM.Status == 'INACTIVE'}"/>
+                    &nbsp;
+                    <apex:outputField value="{!SM.Member.ortoo_qra__User__c}" rendered="{!SM.Member.ortoo_qra__Owner_Type__c != 'Queue'}"/>
+                    <apex:outputLink value="/p/own/Queue/d?id={!SM.Member.ortoo_qra__Queue__c}&setupid=Queues" rendered="{!SM.Member.ortoo_qra__Owner_Type__c == 'Queue'}">
+                        <apex:outputText value="{!SM.Member.Name}"/>
+                    </apex:outputLink>
+                    <apex:outputText value=" [{!SM.Member.ortoo_qra__Owner_Type__c}]" rendered="{!SM.Member.ortoo_qra__Owner_Type__c == 'Queue'}"/>
+                </apex:column>
+                <apex:column >
+					<apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputText value="Enabled" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Shows whether the Member (User) is Enabled or Disabled (for this Assignment Group). Please note this setting impacts Members of this group only.</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>
+					<apex:outputField value="{!SM.Member.ortoo_qra__Is_Active__c}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputText value="Available" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Shows whether the Member (User) is Available to Q-assign for Assignments or not.</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>
+					<apex:outputText value="Yes" rendered="{!SM.Member.ortoo_qra__Owner_Type__c == 'Queue' || SM.Member.User__r.ortoo_qra__Assignment_Group_Is_Active__c}"/>
+                    <apex:outputText value="No"  rendered="{!SM.Member.ortoo_qra__Owner_Type__c != 'Queue' && !SM.Member.User__r.ortoo_qra__Assignment_Group_Is_Active__c}"/>
+                </apex:column>
+				<apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputText value="On Shift" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>It shows if a member is on shift currently or not.</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>
+                    <apex:outputText value="Yes" rendered="{!SM.onShift == 'yes'}"/>
+                    <apex:outputText value="Off-Shift"  rendered="{!SM.onShift == 'no'}"/>
+                    <apex:outputText value="-"  rendered="{!SM.onShift == '-'}"/>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputText value="Logged In" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>The 'Logged In' column shows whether the Member (User) is logged-in to the Salesforce or not by showing 'Yes' or 'No'.</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>				
+                    <apex:outputText value="{!SM.LoggedInUser}" />
+                 </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputText value="Idle Time" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>The 'Idle Time' column shows the time (in minutes) associated with waiting, or when a User is not using Salesforce/Q-assign or is not Active or performing any actions.</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>
+				<apex:outputText value="{!SM.sessionIdleTime}" />
+                 </apex:column>
+                <apex:column >
+					<apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Last Assignment" action="{!DoSortByLastAssignment}" rerender="group_member_list_table"/>
+							<span class="tooltip" style="display:contents">[?]
+								<span>Shows the last assigned date and time of the assignment to a User by Q-assign. The values can be sorted in ascending or descending order by clicking on this column.</span>
+							</span>
+							<apex:outputText rendered="{!SortByLastAssignment == true && CurrentActiveSort == 6}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByLastAssignment == false && CurrentActiveSort == 6}">&darr;</apex:outputText>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:outputField value="{!SM.Member.ortoo_qra__Last_Assignment__c}"/> 
+                </apex:column>
+                <apex:column >
+					<apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputText value="Global Quota Assigned (Max)" />
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Shows the total assigned records (e.g., Leads, Cases etc.) that are assigned to each User by Q-assign app. It also shows the maximum value of 'Global Assignment Quota', if its value is set either on Assignment Group or in the Member settings.</span>
+							</span>
+                        </apex:outputPanel>
+					</apex:facet>
+                <apex:outputPanel rendered="{!SM.Member.ortoo_qra__Owner_Type__c != 'Queue'}">
+                    <apex:outputText value="{!SM.GlobalQuotaAssigned}"/>
+                     <apex:outputPanel >
+                      <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Global_Assignment_Quota__c != null , TRUE, FALSE)}" >
+                    	<apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Global_Assignment_Quota__c != null , SM.Member.ortoo_qra__Global_Assignment_Quota__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                    	<apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Global_Assignment_Quota__c != null , SM.Member.ortoo_qra__Global_Assignment_Quota__c != 0), TRUE, FALSE)}" value="{!SM.GlobalQuotaAssigned_Member}"/>
+                    	<apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Global_Assignment_Quota__c != null , SM.Member.ortoo_qra__Global_Assignment_Quota__c != 0), TRUE, FALSE)}" >) </apex:outputText> 
+                      </apex:outputPanel>
+                      
+                      <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Global_Assignment_Quota__c == null, TRUE, FALSE)}" >
+                        <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                    	<apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c != 0), TRUE, FALSE)}" value="{!SM.GlobalQuotaAssigned_AG}"/>
+                     	<apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Global_Assignment_Quota__c != 0), TRUE, FALSE)}" >) </apex:outputText> 
+                      </apex:outputPanel>
+                   </apex:outputPanel>
+                   </apex:outputPanel>
+                    <apex:outputPanel rendered="{!SM.Member.ortoo_qra__Owner_Type__c == 'Queue'}">
+                    <apex:outputText value="-"/>
+                     </apex:outputPanel>
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Quota Assigned (Max)" action="{!DoSortByQuota}" rerender="group_member_list_table"/>
+							<span class="tooltip" style="display:contents">[?]
+								<span>Shows how many records (e.g., Leads, Cases etc.) have been assigned to this Group Member during the 'Quota Period' (configured in this Assignment Group, e.g., 1 day, 1 week or 1 Month). It won’t affect the number of records assigned to the members unless 'Assignment Quota' is set to a non-zero value, e.g., if you have “Assignment Quota” is set to 5, it would stop assigning out records to any Group Member that has reached a “Quota Assigned” of 5. This value is reset at the end of each ‘Quota Period’, e.g., at the end of each day if the “Quota
+
+Period” is set to Daily. It also shows the maximum value of the 'Assignment Quota', if its value is set either on Assignment Group or in the Member settings. The values can be sorted in ascending or descending order by clicking on this column.</span>
+							</span>
+							<apex:outputText rendered="{!SortByQuota == true && CurrentActiveSort == 1}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByQuota == false && CurrentActiveSort == 1}">&darr;</apex:outputText>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:outputText value="{!SM.QuotaAssigned}"/>
+                     <apex:outputPanel >
+                     
+                       <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Assignment_Quota__c != null, TRUE, FALSE)}">
+                          <apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Assignment_Quota__c != null , SM.Member.ortoo_qra__Assignment_Quota__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                    	  <apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Assignment_Quota__c != null , SM.Member.ortoo_qra__Assignment_Quota__c != 0), TRUE, FALSE)}" value="{!SM.QuotaAssigned_Member}"/>
+                          <apex:outputText rendered="{!IF(AND(SM.Member.Assignment_Quota__c != null , SM.Member.Assignment_Quota__c != 0), TRUE, FALSE) }" >) </apex:outputText>
+                       </apex:outputPanel>
+                       
+                       <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Assignment_Quota__c == null, TRUE, FALSE)}">
+                         <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                         <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c != 0), TRUE, FALSE)}" value="{!SM.QuotaAssigned_AG}"/>
+                         <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Quota__c != 0), TRUE, FALSE)}" >) </apex:outputText>
+                       </apex:outputPanel>
+                       
+                     </apex:outputPanel>               
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Active Records (Cap)" action="{!DoSortByActive}" rerender="group_member_list_table"/>
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Shows the number of Active records (e.g., Leads, Cases etc.) of this Group Member (based on the Active Record Criteria in this Assignment Group). It also shows the maximum value of 'Assignment Cap', if its value is set either in Assignment Group or in the Member settings. The values can be sorted in ascending or descending order by clicking on this column.</span>
+							</span>
+							<apex:outputText rendered="{!SortByActive == true && CurrentActiveSort == 2}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByActive == false && CurrentActiveSort == 2}">&darr;</apex:outputText>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:outputText value="{!SM.ActiveAssignments}"/>
+                    <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Max_Assignment_Cap__c != null, TRUE, FALSE)}">
+                            <apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Max_Assignment_Cap__c != null , SM.Member.ortoo_qra__Max_Assignment_Cap__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                         <apex:outputField rendered="{!IF(AND(SM.Member.ortoo_qra__Max_Assignment_Cap__c != null , SM.Member.ortoo_qra__Max_Assignment_Cap__c != 0), TRUE, FALSE)}" value="{!SM.Member.ortoo_qra__Max_Assignment_Cap__c}"/>
+                         <apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Max_Assignment_Cap__c != null , SM.Member.ortoo_qra__Max_Assignment_Cap__c != 0), TRUE, FALSE)}" >) </apex:outputText>
+                      </apex:outputPanel>
+                       <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Max_Assignment_Cap__c == null, TRUE, FALSE)}">
+                            <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                         <apex:outputField rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c != 0), TRUE, FALSE)}" value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c}"/>
+                         <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Assignments_Level__c != 0), TRUE, FALSE)}" >) </apex:outputText>
+                      </apex:outputPanel>
+                    
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Active Load Points (Cap)" action="{!DoSortByLoadPoints}" rerender="group_member_list_table"/>
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Shows the number of Active records (e.g., Leads, Cases etc.) of this Group Member (based on the Active Record Criteria in this Assignment Group). It also shows the maximum value of 'Assignment Cap', if its value is set either in Assignment Group or in the Member settings. The values can be sorted in ascending or descending order by clicking on this column.</span>
+							</span>
+							<apex:outputText rendered="{!SortByLoadPoints == true && CurrentActiveSort == 5}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByLoadPoints == false && CurrentActiveSort == 5}">&darr;</apex:outputText>
+                               </apex:outputPanel>
+                    </apex:facet>
+                    <apex:outputText value="{!SM.LoadPoints}"/>
+                    <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != null, TRUE, FALSE)}">
+                            <apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != null , SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                         <apex:outputField rendered="{!IF(AND(SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != null , SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != 0), TRUE, FALSE)}" value="{!SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c}"/>
+                         <apex:outputText rendered="{!IF(AND(SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != null , SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c != 0), TRUE, FALSE)}" >) </apex:outputText>
+                      </apex:outputPanel>
+                      
+                      <apex:outputPanel rendered="{!IF(SM.Member.ortoo_qra__Max_Assignment_Points_Cap__c == null, TRUE, FALSE)}">
+                            <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c != 0), TRUE, FALSE)}" >&nbsp;(of&nbsp;</apex:outputText>
+                         <apex:outputField rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c != 0), TRUE, FALSE)}" value="{!ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c}"/>
+                         <apex:outputText rendered="{!IF(AND(ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c != null , ortoo_qra__Assignment_Group__c.ortoo_qra__Max_Assignment_Points_Cap__c != 0), TRUE, FALSE)}" >) </apex:outputText>
+                      </apex:outputPanel>
+                    
+                </apex:column>
+                <apex:column >
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Next Assignment Order" action="{!DoSortByOrder}" rerender="group_member_list_table"/>
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Based on the Assignment Mode (e.g., Load Balanced, Round Robin) and rules configured in the Assignment Group, Q-assign determines the order of Group Members for assignment and then assign the records (e.g., Leads, Cases etc.) to the Member which comes first in that order (i.e., a Member with Next Assignment Order 1 will get the record first). If this member is not eligible for assignment then Q-assign will show appropriate message in this column, e.g., assignment cap reached, member is inactive etc. The values can be sorted in ascending or descending order by clicking on this column.</span>
+							</span>
+							<apex:outputText rendered="{!SortByOrder == true && CurrentActiveSort == 3}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByOrder == false && CurrentActiveSort == 3}">&darr;</apex:outputText>
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:outputText value="{!SM.NextAssignmentOrderLabel}"/>
+                </apex:column>
+                <apex:column rendered="{!IF(ortoo_qra__Assignment_Group__c.ortoo_qra__Assignment_Mode__c == 'Round Robin',true,false)}">
+                     <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:commandlink style="text-decoration:underline" value="Round-Robin Weighting(%)" action="{!DoSortByRoundRobinWeighting}" rerender="group_member_list_table"/>
+                            <span class="tooltip" style="display:contents">[?]
+								<span>Round-Robin Weighting in percentage(%).</span>
+							</span>
+							<apex:outputText rendered="{!SortByRoundRobinWeighting == true && CurrentActiveSort == 7}">&uarr;</apex:outputText>
+                            <apex:outputText rendered="{!SortByRoundRobinWeighting == false && CurrentActiveSort == 7}">&darr;</apex:outputText>
+                        </apex:outputPanel>
+                    </apex:facet>
+                     <apex:outputText rendered="{!IF(SM.Member.ortoo_qra__Round_Robin_Weighting__c == null, TRUE, FALSE)}">100%</apex:outputText>
+                    <apex:outputField value="{!SM.Member.ortoo_qra__Round_Robin_Weighting__c}"/> <apex:outputText rendered="{!IF(SM.Member.ortoo_qra__Round_Robin_Weighting__c != null, TRUE, FALSE)}">%</apex:outputText>
+                </apex:column>
+            </apex:pageBlockTable>
+            <apex:outputPanel id="group_member_list_msg">
+                <apex:outputText value="no existing members" rendered="{!MembersDoNotExist}"/>
+            </apex:outputPanel>
+            
+            <div style="margin-top:10px; margin-left:30%;margin-bottom: 10px;">
+			<apex:outputPanel id="pagination_btn_btm">
+			<apex:outputText style="font-weight:600;margin-right: 5px;" Value="Page Size:" />
+			<apex:actionFunction name="refreshPageSizeBottom" action="{!refreshPageSizeBottom}" status="fetchStatusBottom" reRender="group_member_list_table,pagination_btn,pagination_btn_btm,membersList"/>    
+			<apex:selectList value="{!size_x}" multiselect="false" size="1"  onchange="refreshPageSizeBottom();">
+                    <apex:selectOptions value="{!paginationSizeOptionsBottom}"/> 
+                </apex:selectList> 
+            <apex:outputText style="font-weight:600;margin-right: 5px;" Value="Page:" />
+	            <apex:commandButton status="fetchStatusBottom" reRender="group_member_list_table,pagination_btn,pagination_btn_btm" value="First" action="{!firstRecord}" disabled="{!hasPrevious}" title="First Page"/> 
+                <apex:commandButton status="fetchStatusBottom" reRender="group_member_list_table,pagination_btn,pagination_btn_btm" value="Previous" action="{!previous}" disabled="{!hasPrevious}" title="Previous Page"/>  
+                <apex:commandButton status="fetchStatusBottom" reRender="group_member_list_table,pagination_btn,pagination_btn_btm" value="Next" action="{!next}" disabled="{!hasNext}" title="Next Page"/> 
+                 <apex:outputPanel >                      
+                    <apex:actionStatus id="fetchStatusBottom" >
+                        <apex:facet name="start" >
+                          <img src="/img/loading.gif" />                    
+                        </apex:facet>
+                    </apex:actionStatus>
+                </apex:outputPanel>
+             </apex:outputPanel> 
+           </div>
+        </apex:pageBlock>
+        <script type="text/javascript" src="{!URLFOR($Resource.multiselect,'multiselect/js/jquery.multi-select.js')}"></script>
+        <script type="text/javascript">
+			var j$ = jQuery.noConflict(); 
+			j$(document).ready(function(){
+				j$('.qsclist').multiselect(); 
+				j$('.arclist').multiselect();
+			});
+			var newWin=null;
+			function openLookupPopup(name, id,prefix,is_queue,target_object,search_query)
+			{
+				var url="/apex/ortoo_qra__CustomLookupPopup?namefield=" + name + "&idfield=" + id + "&prefix=" + prefix+"&is_queue=" + is_queue+"&target_object=" + target_object;
+				newWin=window.open(url, 'Popup','height=500,width=600,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+				if (window.focus) 
+				{
+					newWin.focus();
+				}					
+				return false;
+			}
+						  
+			function closeLookupPopup()
+			{
+			   if (null!=newWin)
+			   {
+				  newWin.close();
+			   }  
+			}
+        </script>
+    </apex:form>
+</apex:page>

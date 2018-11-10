@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <webLinks>
+        <fullName>Take_Ownership</fullName>
+        <availability>online</availability>
+        <description>Q-assign: Gives ownership to the user pressing the button and updates Q-assign stats.</description>
+        <displayType>massActionButton</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Take Ownership</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <requireRowSelection>true</requireRowSelection>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/apex.js&quot;)}
+
+var userId = &quot;{!$User.Id}&quot;;
+var objectIdArray = {!GETRECORDIDS($ObjectType.Task)};
+
+if ( objectIdArray.length &gt; 0 )
+{
+var result = sforce.apex.execute(&quot;ortoo_qra/AssignmentController&quot;,
+&quot;takeOwnership&quot;, {userId: userId, objectIdArray: objectIdArray } );
+if( result == &apos;&apos; )
+{
+window.alert( &apos;Ownership taken successfully.&apos; );
+}
+else
+{
+window.alert( &apos;Failed to take ownership. Details: &apos; + result );
+}
+document.location.reload( true );
+}
+else
+{
+window.alert( &apos;Please select at least one record.&apos; );
+}</url>
+    </webLinks>
+    <webLinks>
+        <fullName>Take_Ownership_Detail</fullName>
+        <availability>online</availability>
+        <description>Q-assign: Gives ownership to the user pressing the button and updates Q-assign stats.</description>
+        <displayType>button</displayType>
+        <linkType>javascript</linkType>
+        <masterLabel>Take Ownership</masterLabel>
+        <openType>onClickJavaScript</openType>
+        <protected>false</protected>
+        <url>{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/24.0/apex.js&quot;)}
+
+var userId = &quot;{!$User.Id}&quot;;
+var objectIdArray = [ &quot;{!Task.Id}&quot; ];
+
+if ( objectIdArray.length &gt; 0 )
+{
+var result = sforce.apex.execute(&quot;ortoo_qra/AssignmentController&quot;,
+&quot;takeOwnership&quot;, {userId: userId, objectIdArray: objectIdArray } );
+if( result == &apos;&apos; )
+{
+window.alert( &apos;Ownership taken successfully.&apos; );
+}
+else
+{
+window.alert( &apos;Failed to take ownership. Details: &apos; + result );
+}
+document.location.reload( true );
+}
+else
+{
+window.alert( &apos;Please select at least one record.&apos; );
+}</url>
+    </webLinks>
+</CustomObject>

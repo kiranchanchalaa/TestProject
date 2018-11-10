@@ -1,0 +1,12 @@
+<apex:page standardController="Account" >
+    <apex:chart height="400px" width="200px" animate="true" data="{!Account.name}" >
+            <apex:legend position="left"/>
+            <apex:axis type="Numeric" position="left" fields="data1,data2,data3" title="closed won" grid="true">
+            <apex:chartLabel />
+            </apex:axis>
+            <apex:axis type="Category" position="bottom" fields="names" title="month of the year" >
+            <apex:chartLabel rotate="315" />
+            </apex:axis>
+               <apex:areaSeries axis="left" xField="names" yField="data1,data2,data3" tips="true" />
+         </apex:chart>
+</apex:page>

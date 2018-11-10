@@ -1,0 +1,19 @@
+<apex:page controller="myAccountsCon" >
+    
+    <apex:dataTable value="{!acc}" var="a" styleClass="tabclass" rowClasses="odd,even" id="h">
+    <apex:facet name="caption">table caption</apex:facet>
+        <apex:facet name="header">table header</apex:facet>
+        <apex:facet name="footer">table footer</apex:facet>
+        
+        <apex:column >
+        <apex:facet name="header"> name</apex:facet>
+            <apex:facet name="footer">column footer</apex:facet>
+            <apex:outputText value="{!a.name}" />
+        </apex:column>
+        <apex:column >
+        <apex:facet name="header"> Phone</apex:facet>
+            <apex:facet name="footer">column footer</apex:facet>
+            <apex:outputText value="{!a.phone}" />
+        </apex:column>
+    </apex:dataTable>
+</apex:page>

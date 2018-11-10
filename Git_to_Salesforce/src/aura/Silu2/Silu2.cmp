@@ -1,0 +1,14 @@
+<aura:component >
+    <h1>THis is the line one</h1>
+    <h2> This is the line two</h2>
+    <h4> This is the line four</h4>
+    
+    <aura:attribute name="Ammu" Type="string" default="Ammu" required="true"/>
+    <aura:attribute name="Address" type="string" default="Nellore" required="false"/><br/>
+    <aura:attribute name="phone" type="integer" default="9849100928"/>
+    <div> 
+        NAME:{!v.Ammu}<br/>
+       Address:{!v.Address}<br/>
+       Phone:{!v.phone}<br/>
+    </div>
+</aura:component>

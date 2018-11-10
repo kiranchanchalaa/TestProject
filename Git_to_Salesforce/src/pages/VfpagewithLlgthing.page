@@ -1,0 +1,27 @@
+<apex:page sidebar="false" standardStylesheets="false" showHeader="false"
+           applyBodyTag="false" applyHtmlTag="false" docType="Html-5.0"  standardController="Account" >
+    <apex:stylesheet value="{!URLFOR($Resource.Lightning, '/assets/styles/salesforce-lightning-design-system.css')}" /> 
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" />
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js" />
+    <apex:styleSheet value="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+    <html>
+        <body>
+            <hedder>Congralations</hedder>
+        </body>
+        <articel>
+            <p>hello you got the help of modifications </p>
+        </articel>
+    </html>
+    
+    <apex:pageBlock title="contacts">
+    <apex:pageBlockTable value="{!account.Contacts}" var="a" >
+         <apex:column value="{!a.Lastname}" />
+        <apex:column value="{!a.phone}" />
+        <apex:column value="{!a.name}" />
+        </apex:pageBlockTable>>
+    </apex:pageBlock>
+    
+ 
+</apex:page>

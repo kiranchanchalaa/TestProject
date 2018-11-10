@@ -1,0 +1,45 @@
+<apex:page standardController="Case" showHeader="false" standardStylesheets="false" renderAs="pdf" applyHTMLTag="false">
+    <html>
+     <head>
+        <style>
+          
+           .header{margin: 20px;font-size: 20px;font-weight: bolder;width: 100%;text-align: center;}
+           .title{font-size: 18px;font-weight: bolder;width: 100%;text-align: center;font-family:sans-serif;}
+           .bodyText{font-size:20px; margin:20px;font-family:serif;}
+           .subTitle{margin: 20px;font-size: 20px;font-weight: bolder;width: 100%;}
+         </style>
+    </head>
+     <body>
+       <apex:form >
+             <apex:pageBlock >
+                <div class="header">Bundled Payments for Care Improvement Model 3 Notification Letter<br/><br/></div>
+                 <td class="title"> &nbsp;&nbsp;This {!Case.Account.Name} is Participating in a New Care Improvement Initiative from Medicare</td>
+                
+                <div class="bodyText">{!Case.Contact.LastName} is participating in a Medicare initiative called Bundled Payments for Care Improvement initiative Model 3 (“Bundled Payments Model 3”).  This participation means that {!Case.Account.Name} voluntarily agreed or is working with one or more other organizations who voluntarily agreed to a new payment arrangement with the goal of providing you with high quality, efficient, more coordinated care.  This should not affect your access to care. {!Case.Account.Name}’s participation does not restrict your freedom to choose your health care providers or your access to care for your medical condition.</div>
+                
+                <div class="subTitle">Bundled Payments Model 3 aims to help give you better care</div>
+                
+                <div class="bodyText">Medicare is using the Bundled Payments Model 3 to encourage your doctors to work closely with providers who help you recover after you’re discharged from the hospital, including nursing homes (skilled nursing facilities), home health agencies, inpatient rehabilitation facilities, and long term care hospitals, and with your hospital, so you get better care following your hospital stay.</div>
+                
+                <div class="bodyText">
+                    {!Case.Account.Name} is working closely with certain health care providers that will care for you following your hospital stay and extending through the recovery period, as well as hospitals in the event you are rehospitalized.  By working together, your health care providers are planning more efficient, high quality care as you undergo treatment.  The changes in care you get are expected to lower the cost of care to Medicare, but your costs won’t go up due to these changes in care. Doctors, hospitals, and other providers that care for you following a hospital stay may be rewarded for providing you with high quality, more coordinated care.  Medicare will monitor your care to make sure you and others get high quality care.
+                </div>
+                
+                <br/>
+                <div class="subTitle">It’s your choice which hospital, doctor or other providers you use</div>
+                <div class="bodyText">You have the right to choose which hospital, doctor or other post-hospital stay health care provider you use.</div>
+                <div class="bodyText">
+                    <ul>
+                        <li>To find a different skilled nursing facility, visit Medicare’s Nursing Home Compare website &nbsp;<apex:outputLink value="www.medicare.gov/nursinghomecompare" target="_blank">www.medicare.gov/nursinghomecompare</apex:outputLink> or call 1-800-MEDICARE (1-800-633-4227). TTY users should call 1-877-486-2048.</li>
+                        <li>To find a different home health agency, visit Medicare’s Home Health Agency Compare website &nbsp;<apex:outputLink value="www.medicare.gov/homehealthcompare" target="_blank">www.medicare.gov/homehealthcompare</apex:outputLink> or call 1-800-MEDICARE (1-800-633-4227). TTY users should call 1-877-486-2048.</li>
+                        <li>To find a different doctor, visit Medicare’s Physician Compare website <apex:outputLink value="www.medicare.gov/physiciancompare" target="_blank">www.medicare.gov/physiciancompare</apex:outputLink> or call 1-800-MEDICARE (1-800-633-4227). TTY users should call 1-877-486-2048.</li>
+                        <li>To find a different hospital, visit &nbsp;<apex:outputLink value="www.hospitalcompare.hhs.gov" target="_blank">www.hospitalcompare.hhs.gov</apex:outputLink>  or call 1-800-MEDICARE (1-800-633-4227). TTY users should call 1-877-486-2048. </li>
+                    </ul>
+                </div>
+                <div class="subTitle">Get more information</div>
+                <div class="bodyText">If you have questions or want more information about Bundled Payments Model 3, call {!Case.Account.Name} at {!Case.Account.Name} or call 1-800-MEDICARE. You can also find additional information at <apex:outputLink value="www.innovation.cms.gov" target="_blank">www.innovation.cms.gov.</apex:outputLink></div>
+             </apex:pageBlock>  
+        </apex:form>
+        </body>
+        </html>
+</apex:page>

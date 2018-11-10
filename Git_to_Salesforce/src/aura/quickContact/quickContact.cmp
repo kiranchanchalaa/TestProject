@@ -1,0 +1,34 @@
+<aura:component implements="lightning:actionOverride,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction"
+                access="global"  controller="QuickContactController" >
+    <aura:attribute name="account" type="account"/>
+    <aura:attribute name="newContact" type="contact" default="{'sobjectType': 'Contact'}"/>
+    <!-- default to empty record -->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <!-- Display a header with details about the account -->
+    <div class="slds-page-header" role="banner">
+    <p class="slds-text-heading_label">{!v.account.Name}</p>
+    <h1 class="slds-page-header_titel slds-m-right_small slds-truncate slds-align-left">
+        Create New Contact
+        </h1>
+    </div>
+    <!-- Display the new contact form -->
+  <lightning:input aura:id="contactField" name="firstName" label="First Name"
+                      value="{!v.newContact.FirstName}" required="true"/>
+  
+    <lightning:input aura:id="contactField" name="lastname" label="Last Name"
+                     value="{!v.newContact.LastName}" required="true"/>
+    
+    <lightning:input aura:id="contactField" name="title" label="title"
+                     value="{!v.newContact.Title}"/>
+    <lightning:input aura:id="contactField" type="phone" name="phone" label="Phone Number"
+                     pattern="^(1?(-?\d{3})-?)?(\d{3})(-?\d{4})$"
+                     messageWhenPatternMismatch="The phone number must contain 7, 10, or 11 digits. Hyphens are optional."
+                     value="{!v.newContact.Phone}" required="true"/>
+    
+    <lightning:input aura:id="contactField" type="email" name="email" label="Email"
+                     value="{!v.newContact.Email}" />
+    
+    <lightning:button label="cancel" onclick="{!c.handleCancel}" class="slds-m-top_medium"/>
+    <lightning:button label="save" onclick="{!c.handleSaveContact}" variant="brand" class="slds-m-top_medium"/>
+
+</aura:component>

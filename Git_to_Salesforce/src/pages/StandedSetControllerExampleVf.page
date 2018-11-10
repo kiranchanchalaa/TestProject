@@ -1,0 +1,22 @@
+<apex:page controller="StandedSetControllerExample" >
+    <apex:form >
+    <apex:pageBlock id="pb" >
+    <apex:pageBlockTable value="{!account}" var="a" >
+        <apex:column value="{!a.name}" />
+        <apex:column value="{!a.phone}"/>        
+        </apex:pageBlockTable>
+        <apex:panelGrid columns="7">
+        <apex:commandButton status="fetchStatus" value="|<" action="{!setcon.first}" disabled="{!!setcon.hasPrevious}" title="firstPage"/>
+         <apex:commandButton status="fetchStatus" value="<" action="{!setcon.previous}" disabled="{!!setcon.hasPrevious}" title="firstPage"/>
+          <apex:commandButton status="fetchStatus" value=">" action="{!setcon.next}" disabled="{!!setcon.hasNext}" title="firstPage"/>
+            <apex:commandButton status="fetchStatus" value=">|" action="{!setcon.last}" disabled="{!!setcon.hasNext}" title="firstPage"/> 
+        </apex:panelGrid>
+        <apex:outputText >
+        <apex:commandButton status="fetchStatus" reRender="pb" value="refresh" action="{!refresh}" title="refresh page" />
+            <apex:outputPanel style="color:#4aa02c;font-weight:bold">
+                <apex:actionStatus id="fetchStatus" startText="Fetching..." stopText="" />
+            </apex:outputPanel>
+        </apex:outputText>
+    </apex:pageBlock>
+        </apex:form>
+</apex:page>

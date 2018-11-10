@@ -1,0 +1,9 @@
+<apex:page standardController="contact" extensions="contactcon" >
+    <apex:form >
+         <apex:pageBlock >        
+           <apex:pageBlockButtons location="bottom">
+                <apex:commandButton action="{!Edit}" value="Edit"/>
+           </apex:pageBlockButtons>           
+           </apex:pageBlock>
+    </apex:form>    
+</apex:page>

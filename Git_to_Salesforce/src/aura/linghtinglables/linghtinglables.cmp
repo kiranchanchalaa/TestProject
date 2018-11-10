@@ -1,0 +1,9 @@
+<!--linghtinglables-->
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <lightning:input type="string" name="myName" label="pick a name" value="kiran"/>
+    <lightning:input type="number" name="myNumber" label="{!$Label.Number.PickOne}" />
+     
+    <lightning:button aura:id="k" name="kiran" label="{!c.myAction}"/>
+    {!format($Label.np.labelName, v.name)}
+    {!format($Label.mySection.myLabel, v.attribute1, v.attribute2)}
+</aura:component>

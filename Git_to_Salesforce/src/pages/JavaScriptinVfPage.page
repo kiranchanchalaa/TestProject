@@ -1,0 +1,26 @@
+<apex:page >
+    <apex:form id="fm">
+     
+        <apex:inputText label="Entername" id="name"/>
+        <apex:commandButton value="potie"  onclick="show()" />
+        
+    <script> 
+    function show(){
+        var name=document.getElementById('{!$Component.name}').value;
+        var pbname=document.getElementById('{!$Component.fm:pb:pbs:ln}').value;
+        var pblname=document.getElementById('{!$Component.fm:pb:pbs1:fn}').value;
+        console.log(name+'----'+pbname+'----'+pblname);
+        alert(name+'======='+pbname+pblname);
+         
+        }
+     </script>
+    <apex:pageBlock id="pb">
+        <apex:pageBlockSection id="pbs" >
+        <apex:inputText label="lastname" id="ln" />         
+        </apex:pageBlockSection>
+        <apex:pageBlockSection id="pbs1" >
+        <apex:inputText label="firstname"  id="fn" />
+        </apex:pageBlockSection>
+    </apex:pageBlock>  
+ </apex:form>
+</apex:page>

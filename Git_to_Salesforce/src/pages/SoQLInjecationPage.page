@@ -1,0 +1,7 @@
+<apex:page controller="SoQLInjecation" >
+    <apex:form >
+        <apex:outputText value="Enter Name" />
+        <apex:inputText value="{!name}" />
+        <apex:commandButton value="Query" action="{!Query}"/>
+    </apex:form>
+</apex:page>

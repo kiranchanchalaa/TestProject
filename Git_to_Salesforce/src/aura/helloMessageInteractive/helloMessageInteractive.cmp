@@ -1,0 +1,8 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+    <aura:attribute name="message" type="string"/>
+    <p>message of the day{!v.message}</p>
+    <div>
+        <lightning:button label="your looking nice to day" onclick="{!c.handleClick}"/>
+        <lightning:button label="your going greet day" onclick="{!c.handleClick}"/>
+    </div>
+</aura:component>

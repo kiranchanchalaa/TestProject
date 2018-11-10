@@ -1,0 +1,9 @@
+<apex:page controller="MyController" tabStyle="Account" >
+    <apex:form >
+    <apex:pageBlock title="Congratulations{!$User.FirstName}">
+        this belogs to Account:<apex:inputField value="{!account.name}"/>
+        this os belongs to site<apex:inputField value="{!account.site}" />
+       <apex:commandButton value="save" action="{!save}" />
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

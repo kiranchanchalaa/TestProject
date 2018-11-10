@@ -1,0 +1,11 @@
+<apex:page controller="kiran" >
+    <apex:form >
+ <apex:commandLink value="new" onclick="window.open('/apex/NewAndExisting')" />
+  <apex:commandButton value="ammu" action="{!ammu}"/>    
+    <apex:pageBlock >
+     Name:<apex:inputField value="{!cs.Name}" />
+     Phone:<apex:inputField value="{!cs.phone}" />
+    <apex:commandButton value="hello" action="{!hello}" />
+    </apex:pageBlock>
+         </apex:form>
+ </apex:page>

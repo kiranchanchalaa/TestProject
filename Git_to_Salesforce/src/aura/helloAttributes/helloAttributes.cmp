@@ -1,0 +1,7 @@
+<!--c:helloAttributes--> 
+<aura:component >
+    <aura:attribute name="sush" type="string" default="world"/>
+    <div>
+    Hello:{!v.sush}!
+    </div>
+</aura:component>

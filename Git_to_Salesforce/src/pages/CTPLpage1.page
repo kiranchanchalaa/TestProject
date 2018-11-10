@@ -1,0 +1,46 @@
+<apex:page standardStylesheets="false" sidebar="false" showHeader="false" lightningStylesheets="true" >
+ <style>
+   .green{
+    background-color: green;
+     color:red;
+     font-size:100px;
+  }
+    </style>
+ <apex:form >
+     <apex:pageBlock title="ParkingSystem" >
+          <apex:commandButton value="New Slot" style="margin-left: 40em"/>
+          <apex:commandButton value="CheckStatus" style="margin-left: 1em"/>
+          <apex:commandButton value="CheckStatus" style="margin-left: 1em"/>
+          <apex:commandButton value="New Slot" style="margin-left: 40em"/>
+          <apex:commandButton value="CheckStatus" style="margin-left: 1em"/>
+          <apex:commandButton value="CheckStatus" style="margin-left: 1em"/>
+         
+      <apex:pageBlockSection >
+          
+    <td class="green">
+         <tr> 
+               hello world :<b><button type="button">Log in</button></b>
+          </tr>
+     </td>
+          <div class="slds-align_absolute-center" style="height: 5rem;">
+        This content will be positioned in the absolute center of its container</div>
+          <div style="padding: 1rem;">
+<div class="slds-align_absolute-center" style="text-align: center; width: 8rem; background-color: rgb(255, 255, 255);">
+<div class="slds-border_top">This should have a top border.</div>
+</div>
+</div>
+          <div class="slds-box">
+          <dl>
+<dt>First Label:</dt>
+<dd>Description for first label</dd>
+<dt>Second Label:</dt>
+<dd>Description for second label</dd>
+</dl>
+</div>
+
+          
+    </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

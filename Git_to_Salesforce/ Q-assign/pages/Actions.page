@@ -1,0 +1,246 @@
+<apex:page lightningStylesheets="true" standardcontroller="ortoo_qra__Action__c" extensions="ortoo_qra.ActionsController" >
+	<apex:variable var="uiTheme" value="lightningDesktop" rendered="{!$User.UIThemeDisplayed == 'Theme4d'}">
+		<link href="{!URLFOR($Resource.CustomStyle, 'CustomStyle.css')}" rel="stylesheet" media="screen"/>
+	</apex:variable>
+	<apex:form >
+		<apex:sectionHeader title="QA Actions"/>
+		&nbsp;&#171;&nbsp;
+		<apex:outputLink value="/{!assignmentGroupId}">Back to Parent : {!assignmentGroup.Name}</apex:outputLink>
+		<br/><br/>
+		
+		<apex:pagemessages id="pg_msg"/>
+		<apex:pageBlock title="Action" id="editpb">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Edit" action="{!EditRecord}" rendered="{!AND( IsEditAllowed,NOT(editIsActive) )}"/>
+				<apex:commandButton value="Delete" action="{!DeleteRecord}"  rendered="{!AND( IsDeleteAllowed , NOT(editIsActive) )}"/>
+				<apex:commandButton value="Save" action="{!SaveRecord}" rendered="{!editIsActive}"/>
+				<apex:commandButton value="Cancel" action="{!CancelRecord}" rendered="{!editIsActive}"/> 
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Trigger" columns="1" collapsible="false" id="editpb_tr" rendered="{!editIsActive}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Processing Order:"/>
+					<apex:inputField value="{!actionObject.ortoo_qra__Processing_Order__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Action Type:"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!actionObject.ortoo_qra__Action_Type__c}" size="1">
+							<apex:selectoptions value="{!ActionType}"/>
+							<apex:actionsupport event="onchange" status="actionchangeStatus" action="{!onChangeActionType}" rerender="editpb,pg_msg"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="actionchangeStatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Trigger On:"/>
+					<apex:selectList value="{!actionObject.ortoo_qra__Trigger_On__c}" size="1">
+						<apex:selectoptions value="{!TriggerOn}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Trigger Type:"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!actionObject.ortoo_qra__Trigger_Type__c}" size="1">
+							<apex:selectoptions value="{!TriggerType}"/>
+							<apex:actionsupport event="onchange" action="{!onChangeTriggerType}" status="typechangeStatus" rerender="editpb_tr"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="typechangeStatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!isMatchPattern}">
+					<apex:outputLabel value="Match Field:"/>
+					<apex:selectList value="{!actionObject.ortoo_qra__Match_Field__c}" size="1">
+						<apex:selectoptions value="{!MatchField}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!isMatchPattern}">
+					<apex:outputLabel value="Match Pattern:"/>
+					<apex:inputField value="{!actionObject.ortoo_qra__Match_Pattern__c}" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Action" columns="1" collapsible="false" id="editpb_ar_flow" rendered="{!AND(IsRunFlow ,editIsActive)}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Select Flow:"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!actionObject.ortoo_qra__Flow_Name__c}" size="1">
+							<apex:selectoptions value="{!VisualFlows}"/>
+							<apex:actionsupport event="onchange" action="{!onChangeFlowName}" rerender="editpb,pg_msg" status="flowchangeStatus"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="flowchangeStatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Select parameter to pass ID of the {!objectLabel}:"/>
+					<apex:selectList value="{!actionObject.ortoo_qra__Flow_Parameter__c}" size="1">
+						<apex:selectoptions value="{!VisualFlowParamters}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Action Rules" columns="1" collapsible="false" id="editpb_ar" rendered="{!AND(NOT(IsRunFlow) ,editIsActive)}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Assignment Type:"/>
+					<apex:selectList value="{!actionObject.ortoo_qra__Assignment_Type__c}" size="1">
+						<apex:selectoptions value="{!AssignmentType}"/>
+					</apex:selectList>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Object to Update:"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!actionObject.ortoo_qra__Object_to_Update__c}" size="1">
+							<apex:selectoptions value="{!ObjectsToUpdate}"/>
+							<apex:actionsupport event="onchange" action="{!onChangeObjectToUpdate}" status="objectchangeStatus" rerender="editpb"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="objectchangeStatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Field to Update:"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!actionObject.ortoo_qra__Field_to_Update__c}" size="1">
+							<apex:selectoptions value="{!FieldsToUpdate}"/>
+							<apex:actionsupport event="onchange" action="{!onChangeFieldToUpdate}" status="fieldchangeStatus" rerender="editpb"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="fieldchangeStatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Field Value to Assign:"/>
+					<apex:outputPanel >
+						<apex:selectList value="{!DateOption}" size="1" rendered="{!OR(isDate , isDateTime)}">
+							<apex:selectoptions value="{!DateOptions}"/>
+							<apex:actionsupport event="onchange" rerender="editpb" status="datechangeStatus"/>
+						</apex:selectList>
+						&nbsp;
+						<apex:actionStatus id="datechangeStatus">
+							<apex:facet name="start">
+								<img src="/img/loading.gif" />                  
+							</apex:facet>
+						</apex:actionStatus>
+						<apex:outputText value=" | " rendered="{!OR(isDate , isDateTime)}"/>
+						<apex:inputField value="{!DateObj.ActivityDate}" rendered="{!AND(DateOption != 'TODAY' ,isDate)}"/>
+						<apex:inputField value="{!DateTimeObj.ortoo_qra__Last_Scheduled_Assignment_Date__c}" rendered="{!AND(DateOption != 'TODAY' ,isDateTime)}"/>
+						<apex:outputText value="Offset: " rendered="{!AND(OR(isDate,isDateTime),DateOption == 'TODAY')}"/>
+						<apex:inputField value="{!actionObject.ortoo_qra__Off_Set__c}"	rendered="{!AND(OR(isDate,isDateTime),DateOption == 'TODAY')}" style="width: 50px;"/>
+						<apex:inputCheckbox value="{!actionObject.ortoo_qra__Field_Value_to_Assign__c}"  rendered="{!isBoolean}"/>
+						<apex:selectList value="{!actionObject.ortoo_qra__Field_Value_to_Assign__c}" size="1"  rendered="{!isPicklist}">
+							<apex:selectoptions value="{!picklistOptions}"/>
+						</apex:selectList>
+						<apex:selectList value="{!fieldValueList}" multiselect="true" rendered="{!isMultiPicklist}">
+							<apex:selectoptions value="{!picklistOptions}"/>
+						</apex:selectList>
+						<apex:inputField value="{!actionObject.ortoo_qra__Field_Value_to_Assign__c}" rendered="{!isNormal}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Overwrite non-blank values:"/>
+					<apex:inputCheckbox value="{!actionObject.ortoo_qra__Overwrite_non_blank_Values__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Stop Processing Further Rules:"/>
+					<apex:inputcheckbox value="{!actionObject.ortoo_qra__Stop_Processing_Further_Rules__c}"/>
+				</apex:pageBlockSectionItem>
+				
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Trigger" columns="1" collapsible="false" id="viewpb_tr" rendered="{!NOT(editIsActive)}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Action Type:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Action_Type__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Trigger On:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Trigger_On__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Trigger Type:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Trigger_Type__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!isMatchPattern}" >
+					<apex:outputLabel value="Match Field:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Match_Field__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem rendered="{!isMatchPattern}">
+					<apex:outputLabel value="Match Pattern:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Match_Pattern__c}" />
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Action" columns="1" collapsible="false" id="viewpb_ar_flow" rendered="{!AND(IsRunFlow ,NOT(editIsActive))}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Select Flow:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Flow_Name__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Select parameter to pass ID of the {!objectLabel}:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Flow_Parameter__c}"/>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<apex:pageBlockSection title="Action" columns="1" collapsible="false" id="viewpb_ar" rendered="{!AND(NOT(IsRunFlow) ,NOT(editIsActive))}">
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Assignment Type:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Assignment_Type__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Object to Update:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Object_to_Update__c}" />
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Field to Update:"/>
+					<apex:outputField value="{!actionObject.ortoo_qra__Field_to_Update__c}"/>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Field Value to Assign:"/>
+					<apex:outputPanel >
+						<apex:outputField value="{!actionObject.ortoo_qra__Field_Value_to_Assign__c}"/>
+						<apex:outputText value=" + " rendered="{!DateOption == 'TODAY'}"/>
+						<apex:outputField value="{!actionObject.ortoo_qra__Off_Set__c}" rendered="{!DateOption == 'TODAY'}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Overwrite non-blank values:"/>
+					<apex:outputPanel >
+						<apex:image value="/img/checkbox_checked.gif" rendered="{!actionObject.ortoo_qra__Overwrite_non_blank_Values__c}" />
+						<apex:image value="/img/checkbox_unchecked.gif" rendered="{!NOT(actionObject.ortoo_qra__Overwrite_non_blank_Values__c)}" />
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Stop Processing Further Rules:"/>
+					<apex:outputPanel >
+						<apex:image value="/img/checkbox_checked.gif" rendered="{!actionObject.ortoo_qra__Stop_Processing_Further_Rules__c}"/>
+						<apex:image value="/img/checkbox_unchecked.gif" rendered="{!NOT(actionObject.ortoo_qra__Stop_Processing_Further_Rules__c)}"/>
+					</apex:outputPanel>
+				</apex:pageBlockSectionItem>
+				
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	  </apex:form>
+</apex:page>

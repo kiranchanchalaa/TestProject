@@ -1,0 +1,23 @@
+<apex:page controller="actionFunctionDevloperGaidExample">
+    <apex:form >
+    <apex:actionFunction name="sayhello" action="{!sayhello}" reRender="out" status="myStatus" />
+    </apex:form>
+    <apex:outputPanel id="out" >
+        <apex:outputText value="hello"/>
+        <apex:actionStatus startText="requesting...." id="myStatus">
+        <apex:facet name="stop">
+            {!Username}
+            </apex:facet>
+        </apex:actionStatus>
+    </apex:outputPanel>
+     <script>window.setTimeout(sayhello,2000)</script>
+    <p><apex:outputText value="Clicked? {!state}" id="showstate"/> </p>
+    <apex:outputPanel onclick="methodOneInJavascript('yes!')"  styleClass="btn">
+         Click Me
+ </apex:outputpanel>
+         <apex:form >
+             <apex:actionFunction name="methodOneInJavascript" action="{!methodOne}" rerender="showstate"> 
+                 <apex:param name="firstParam" assignTo="{!state}" value="" />
+            </apex:actionFunction>
+          </apex:form>   
+</apex:page>

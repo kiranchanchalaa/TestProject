@@ -1,0 +1,37 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	 <aura:attribute name="tabvalues" type="string" default="world"/>
+    <div>
+    <lightning:formattedNumber value="12.34" style="currency" 
+                               currencyCode="EUR"/>
+        <lightning:input name="percentVal" type="number" label="Enter a percentage value" formatter="percent" step="0.01"/>  
+    </div>
+    <div>
+    <lightning:formattedNumber value="12.34" style="currency" 
+               currencyCode="USD" currencyDisplayAs="symbol"/>
+        <lightning:input name="currencyVal" type="number" label="enter a doller" formatter="currency" step="0.01"/>
+    </div>
+    <div>
+     <form>
+       <fieldset>
+           <legend>Select your faourite color</legend>
+           <lightning:input type="checkbox" label="Red" name="color1" value="1" aura:id="colors"/>
+           <lightning:input type="checkbox" label="green" name="color2" value="2" aura:id="colors"/>
+           <lightning:input type="checkbox" label="whaite" name="color3" value="3" aura:id="colors"/>
+         </fieldset> 
+         <lightning:button label="submit" onclick="{!c.submitForm}"/>
+     </form>
+    </div>
+    <!-- Reusing Event Handlers-->
+    <div>
+        <lightning:button label="new record" name="new" onclick="{!c.handleClick}"/>
+        <lightning:button label="edit" name="edit" onclick="{!c.handleClick}"/>
+        <lightning:button label="delete" name="delete" onclick="{!c.handleClick}"/>
+    </div>
+    <div>
+         <lightning:tabset >            
+            <lightning:tab onactive="{!c.handleActive}" label="tab 1" id="tab 1"/>
+            <lightning:tab onactive="{!c.handleActive}" label="tab 2" id="tab 2"/>
+             </lightning:tabset> 
+        {!v.tabvalues}
+    </div>
+</aura:component>

@@ -1,0 +1,29 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<div>
+    <lightning:button label="Download" iconName="utility:download" onclick="{!c.doSomething}"/>
+    <lightning:button label="Download" iconName="utility:download" onclick="{!c.doSomething}"/>
+    <!-- Good: using span/assistiveText to hide the label visually, but show it to screen readers -->
+<button>
+    ::before
+    <span class="slds-assistive-text">Settings</span>
+</button>
+  </div>
+    <div>
+    <!-- Good:using label/for= -->
+<label for="fullname">Enter your full name:</label>
+<input type="text" id="fullname" />
+
+<!-- Good:using implicit label>-->
+<label>Enter your full name:
+    <input type="text" id="fullname"/>
+</label>
+    </div>
+    
+    <div>
+       <lightning:input type="number" name="myNumber" aura:id="num1" label="Number 1"/> +
+        <lightning:input type="number" name="myNumber" aura:id="num2" label="Number 2"/><br/>
+        <lightning:button label="Add" onclick="{!c.clickAdd}"/>
+    </div>
+   
+    
+</aura:component>

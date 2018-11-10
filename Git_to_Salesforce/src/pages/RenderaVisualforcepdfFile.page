@@ -1,0 +1,26 @@
+<apex:page standardController="Account" renderAs="pdf">
+    <apex:stylesheet value="{!URLFOR($Resource.Lightning,'pdf.css')}"/>
+    <h1>Well come to unversal sample </h1>
+    <P>thank you,<b><apex:outputText value="{!account.name}" /></b>for
+    becoming a new account with Universal Samples.</P>
+    
+    <p>Your Account Detiels are:</p>
+    <tabel>
+        <tr><th>Account Name</th>
+            <td>
+                <apex:outputText value="{!Account.name}" /> 
+            </td>
+        </tr>
+        <tr><th>Account rep</th>
+            <td>
+                <apex:outputText value="{!Account.Owner.name}" /> 
+            </td>
+        </tr>
+        <tr><th>Customer Scince</th>
+            <td>
+                <apex:outputText value="{0,date,long}" /> 
+                <apex:outputText value="{!Account.CreatedDate}" />
+            </td>
+        </tr>
+    </tabel>
+</apex:page>

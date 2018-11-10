@@ -1,0 +1,21 @@
+<apex:page controller="ACTIONFUN" >
+    <apex:messages />
+    <apex:form >
+    <apex:actionFunction name="AMMU" action="{!accountstatus}" reRender="Silu" />
+     <apex:actionFunction name="sushma" action="{!opportunitystatus}" reRender="sush"/>   
+        <apex:pageBlock >
+        <apex:pageBlockSection title="if name is ammu then its showing the next field" id="Silu" >
+            <apex:inputField value="{!accs.Rating}" onchange="AMMU()" />
+            <apex:inputField value="{!accs.Name}" rendered="{!showtext}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:pageBlock >
+            <apex:pageBlockSection title="if name is sushma then its showing the next field" id="sush">
+                <apex:pageBlockSectionItem >
+                    <apex:outputText value="{!test}" /> </apex:pageBlockSectionItem>
+                <apex:inputField value="{!opty.StageName}" onchange="sushma()"/>
+                <apex:inputField value="{!opty.Type}" rendered="{!showtext}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

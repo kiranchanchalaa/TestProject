@@ -1,0 +1,144 @@
+<apex:page lightningStylesheets="true" controller="ortoo_qra.UserAssignmentStatusController" id="thePage" title="QA User Status" tabstyle="ortoo_qra__User_Assignment_Status__tab">
+		<style type="text/css">
+		  .pbTitle {
+		    white-space: nowrap;
+		  }
+		</style>
+		 <link href="{!URLFOR($Resource.CustomStyle, 'CustomStyle.css')}" rel="stylesheet" media="screen"/>
+   
+		<script>
+		function openLookupPopup(name,target_id ,prefix,source,target_object)
+		{
+			var search_term = '';
+			
+			search_term = document.getElementById("{!$Component.thepage:theForm:user_block:targetName}").value;
+		    var url="/apex/ortoo_qra__CustomLookupPopup?namefield=" + name + "&idfield=" + target_id + "&prefix=" + prefix+"&is_queue=" + source+"&target_object=" + target_object+"&search_term="+search_term;
+			newWin=window.open(url, 'Popup','height=500,width=600,left=100,top=100,resizable=no,scrollbars=yes,toolbar=no,status=no');
+			if (window.focus) 
+			{
+				newWin.focus();
+			}
+				
+		    return false;
+	    }
+	    function closeLookupPopup()
+		{
+		   if (null!=newWin)
+		   {
+		      newWin.close();
+		   }  rerenderTopPanel();
+		   
+		}
+		</script> 
+		<apex:form id="theForm">
+		<apex:sectionHeader title="{!$Organization.Name}" subtitle="Q-assign User's Status"/>
+		<apex:outputPanel id="wholePage">
+		<apex:pageBlock title="Select User" id="user_block"  rendered="{!IsCurrentUserAManagerOrAdmin}" >
+		    <table style="width: 30%;">
+            	<tr>
+            	<td>
+            	<apex:actionFunction action="{!userChanged}" name="rerenderTopPanel" rerender="statusList,wholePage,login_in_qassign,available_for_qassign" />
+	                  <apex:actionRegion >
+	                  <apex:inputHidden value="{!Username}" id="targetName" />
+	                  <apex:inputHidden value="{!User_ID}" id="targetId" />
+	                 </apex:actionRegion>
+	                  <apex:outputText value="User: "/>
+	                  <apex:commandButton status="actStatus" value="Select User" onclick="openLookupPopup('{!$Component.targetName}', '{!$Component.targetId}' , '005','USER',''); return false" />
+             </td>
+                 </tr>
+            </table>
+		</apex:pageBlock>
+		<apex:pageBlock title="Assignment Group Membership Status for {!Username}" id="statusList">
+		
+			<apex:pageMessages id="error_messages"/> 
+				
+			<apex:pageBlockSection columns="2" collapsible="false">
+			<apex:pageBlockSectionItem helpText="{!AvailableforQassign_HelpText}">
+                    <c:customHelpTextLabel labelValue="Available for Q-Assign:" helpTextID="Available" helpText="{!AvailableforQassign_HelpText}"/>
+                    <apex:outputPanel id="available_for_qassign">
+                        <apex:actionRegion >
+                            <apex:inputCheckbox value="{!objUser.ortoo_qra__Assignment_Group_Is_Active__c}">
+                                <apex:actionSupport event="onchange" reRender="active_flags, user_status_list_table,available_for_qassign" action="{!ChangeAvaliableForQassign}" status="activeFlagsActStatus"/>
+                            </apex:inputCheckbox>                            
+                        </apex:actionRegion>
+                        <apex:image value="{!$Resource.ortoo_qra__green_spot}" title="User enabled for Q-Assign Assignment Groups" rendered="{!objUser.ortoo_qra__Assignment_Group_Is_Active__c == true}"/>
+	                    <apex:image value="{!$Resource.ortoo_qra__red_spot}" title="User disabled for Q-Assign Assignment Groups" rendered="{!objUser.ortoo_qra__Assignment_Group_Is_Active__c == false}"/>
+                        <apex:actionStatus id="activeFlagsActStatus">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+                    </apex:outputPanel>
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem helpText="{!UserLoggedIn_HelpText}">
+                	<c:customHelpTextLabel labelValue="Logged In:" helpTextID="LoggedIn" helpText="{!UserLoggedIn_HelpText}"/>
+                	<apex:outputPanel id="login_in_qassign" >
+                		&nbsp;
+	                	<apex:image value="{!$Resource.ortoo_qra__green_spot}" title="User is logged in" rendered="{!AND(isUserLoginInQAssign == true , LoggedInStatus == true)}"/>
+	                    <apex:image value="{!$Resource.ortoo_qra__red_spot}" title="User is not logged in" rendered="{!OR(isUserLoginInQAssign == false ,LoggedInStatus == false)}"/>
+                    	<apex:actionStatus id="loginFlagsActStatus">
+			                <apex:facet name="start">
+			                  <img src="/img/loading.gif" />                 
+			                </apex:facet>   
+			            </apex:actionStatus>
+                    </apex:outputPanel> 
+                </apex:pageBlockSectionItem>
+			</apex:pageBlockSection> 
+			<br/>
+			<apex:commandLink action="{!Enableforall}" rerender="statusList" status="statusListActStatus">
+				<apex:outputText value="Enable for all groups" />
+				<apex:actionStatus id="statusListActStatus">
+	                <apex:facet name="start">
+	                  <img src="/img/loading.gif" />                 
+	                </apex:facet>   
+	            </apex:actionStatus>
+			</apex:commandLink>
+			 &nbsp; |  &nbsp;
+			<apex:commandLink action="{!Disableforall}" rerender="statusList" status="statusListActStatus2">
+				<apex:outputText value="Disable for all groups" />
+				<apex:actionStatus id="statusListActStatus2">
+	                <apex:facet name="start">
+	                  <img src="/img/loading.gif" />                 
+	                </apex:facet>   
+	            </apex:actionStatus>
+			</apex:commandLink>
+			<apex:pageBlockTable value="{!UserAssignmentGroupMemberStatusList}" var="US" id="user_status_list_table">
+				<apex:column headerValue="Action">
+					<apex:commandLink action="{!ChangeAssignmentGroupMemberActiveStatus}" rerender="statusList">
+						<apex:outputText value="Enable" rendered="{!US.Member.ortoo_qra__Is_Active__c != true}"/>
+						<apex:outputText value="Disable" rendered="{!US.Member.ortoo_qra__Is_Active__c == true}"/>
+						<apex:param name="editrowmemberid" value="{!US.Member.Id}" assignTo="{!EditRowAssignmentGroupMemberId}"/>
+					</apex:commandLink>
+					&nbsp; &nbsp; 
+					<apex:commandLink value="{!US.ObjectName}" action="{!Pull}" rendered="{!US.Member.Assignment_Group__r.ortoo_qra__Show_Pull_Button__c && US.Member.Assignment_Group__r.ortoo_qra__Is_Active__c}" rerender="AssignedRecord,error_message"> 
+						<apex:param name="editrowgroupid" value="{!US.Member.ortoo_qra__Assignment_Group__c}" assignTo="{!EditRowAssignmentGroupId}"/>
+						<apex:param name="editrowmemberid" value="{!US.Member.Id}" assignTo="{!EditRowAssignmentGroupMemberId}"/>
+					</apex:commandLink>
+				</apex:column>
+				<apex:column headerValue="Assignment Group">
+					<apex:outputField value="{!US.Member.ortoo_qra__Assignment_Group__c}"/>
+					<apex:outputLabel value="(inactive)" rendered="{!US.groupActive == false}"/>
+				</apex:column>
+				<apex:column headerValue="Enabled">
+					<apex:outputField value="{!US.Member.ortoo_qra__Is_Active__c}"/>
+				</apex:column>
+				<apex:column headerValue="Status" title="{!US.StatusTitle}">
+					&nbsp;&nbsp;&nbsp;&nbsp;
+					<apex:image value="{!$Resource.ortoo_qra__green_spot}" rendered="{!US.Status == 'ACTIVE'}"/>
+					<apex:image value="{!$Resource.ortoo_qra__red_spot}" rendered="{!US.Status == 'INACTIVE'}"/>
+				</apex:column>
+			</apex:pageBlockTable>
+			<apex:outputPanel id="user_status_list_msg"> 
+				<apex:outputText value="{!objUser.Name} is currently not a member of any assignment group(s)" rendered="{!MemberRowsDoNotExist}"/>
+			</apex:outputPanel>
+		</apex:pageBlock>
+		<apex:pageMessages id="error_message"/>
+		<apex:outputPanel id="AssignedRecord">
+		<apex:outputLabel value="Assigned {!ObjectTitle}:" rendered="{!AssignedRecord}"/>
+		<apex:outputLink value="/{!RecordId}"  rendered="{!AssignedRecord}">
+		 Click here
+		</apex:outputLink>
+		</apex:outputPanel>
+		</apex:outputPanel>
+	</apex:form>
+</apex:page>

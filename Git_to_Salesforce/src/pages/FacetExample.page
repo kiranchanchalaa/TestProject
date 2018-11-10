@@ -1,0 +1,13 @@
+<apex:page standardController="Account" sidebar="false" showHeader="false">
+    <apex:flash src="http://www.dhs.state.il.us/accessibility/tests/flash/video.html" height="300" width="300" loop="true" play="true"/>
+    <apex:dataTable value="{!account.contacts}" var="a" cellpadding="4" border="1">
+        <apex:column >
+        <apex:facet name="header">names</apex:facet>
+            {!a.LastName}
+        </apex:column>
+        <apex:column >
+        <apex:facet name="header">phone</apex:facet>
+            {!a.phone}
+        </apex:column>
+    </apex:dataTable>
+</apex:page>

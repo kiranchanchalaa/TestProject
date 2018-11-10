@@ -1,0 +1,9 @@
+<apex:page standardController="case">
+   <apex:form >     
+   <apex:pageBlock title="Lookup" >
+       <apex:pageBlockSection >
+    <apex:inputField value="{!case.AccountID}"/>
+           </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
