@@ -1,9 +1,8 @@
 <apex:page controller="accoptycon" >
-<apex:pageBlock >    
+<!--  <apex:pageBlock >    
     <apex:pageBlockTable value="{!accopty}" var="a">
       <apex:column value="{!a.name}"/>
-        <td>
-            
+        <td>            
         <apex:repeat value="{!a.contacts}" var="b">
             <apex:column value="{!b.lastname}" />
             </apex:repeat>
@@ -14,5 +13,20 @@
             </apex:repeat>
         </td>
     </apex:pageBlockTable> 
-</apex:pageBlock>
+</apex:pageBlock>-->
+    
+    <apex:repeat value="{!accopty}" var="a">
+      <apex:pageBlock title="{!a.name}" >
+          <div>
+         <apex:repeat value="{!a.contacts}" var="b" >
+             <apex:outputField value="{!b.id}" /><br/>                    
+          </apex:repeat> <br/> 
+          </div>   
+          <div titel='opportunity'>
+         <apex:repeat value="{!a.Opportunities}" var="o">
+             <apex:outputField value="{!o.id}" /><br/>
+         </apex:repeat>
+          </div> 
+      </apex:pageBlock>      
+    </apex:repeat>
 </apex:page>

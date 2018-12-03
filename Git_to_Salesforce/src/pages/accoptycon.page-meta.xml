@@ -5,9 +5,19 @@
     <confirmationTokenRequired>false</confirmationTokenRequired>
     <label>accoptycon</label>
     <packageVersions>
+        <majorNumber>4</majorNumber>
+        <minorNumber>30</minorNumber>
+        <namespace>INFA</namespace>
+    </packageVersions>
+    <packageVersions>
         <majorNumber>1</majorNumber>
         <minorNumber>8</minorNumber>
         <namespace>dupe_eliminator</namespace>
+    </packageVersions>
+    <packageVersions>
+        <majorNumber>4</majorNumber>
+        <minorNumber>459</minorNumber>
+        <namespace>ortoo_qra</namespace>
     </packageVersions>
     <packageVersions>
         <majorNumber>1</majorNumber>

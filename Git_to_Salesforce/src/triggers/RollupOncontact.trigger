@@ -1,5 +1,5 @@
 trigger RollupOncontact on Contact (After insert, After delete, After undelete) {
-    Set<Id> parentIdsSet = new Set<Id>();
+   /* Set<Id> parentIdsSet = new Set<Id>();
     List<Account> accountListToUpdate = new List<Account>();
     IF(Trigger.IsAfter){
         IF(Trigger.IsInsert || Trigger.IsUndelete){
@@ -28,5 +28,32 @@ trigger RollupOncontact on Contact (After insert, After delete, After undelete) 
         update accountListToUpdate;
     }catch(System.Exception e){
         
- }  
+ }  */
+    set<id>ids=new set<id>();
+     list<Account> accmap=new list<account>();
+     if(trigger.isinsert || trigger.isundelete){
+         for(contact c: trigger.new){
+             if(c.accountid!=null){
+                 ids.add(c.accountId);
+             }
+         }
+         
+     }
+     if(trigger.isdelete){
+         for(Contact c: trigger.old){
+             if(c.Accountid!=null){
+                 ids.add(c.AccountId);
+             }
+         }
+     }
+    System.debug('set of ids=======>' + accmap);
+     list<account> ac=new list<Account>([select id,name,(select id,lastname from contacts) from account where id=:ids]);
+     for(Account a: ac){
+         list<contact> c=a.contacts;
+         a.name='Related contact:-' + string.valueOf(c.size());
+         accmap.add(a);
+     }
+     if(accmap.size()>0){
+         update accmap;
+     }
 }

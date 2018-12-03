@@ -13,6 +13,7 @@ trigger AcctoContactTrigger on AccountContactRelation (after update,after insert
         if(oldval.Roles!=newval.Roles){
             ids.add(a);
         }
+        
     }
     
     list<AccountContactRelation> con = [select id,Contact.Lastname, Contact.phone,

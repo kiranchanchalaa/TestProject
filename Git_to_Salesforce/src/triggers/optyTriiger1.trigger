@@ -53,10 +53,8 @@ trigger optyTriiger1 on Opportunity (before insert,before update,After update,af
                          contact c1=new contact();
                          c1.LastName=op6.name;
                         c.add(c1);
-                    }
-                 
-                    
-        }
+                    }              
+         }
         
     }
 }
